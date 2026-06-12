@@ -12,7 +12,8 @@ import {
   type LogRow,
   type ScheduledDose,
 } from "@/lib/medication-utils";
-import { Check, X, Clock, Pill, Plus, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Check, X, Clock, Pill, Plus, AlertCircle, CheckCircle2, Calendar as CalendarIcon, Stethoscope, MapPin } from "lucide-react";
+import { statusInfo, typeLabel, formatTime as formatApptTime, type AppointmentRow } from "@/lib/appointment-utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -27,14 +28,21 @@ function useDashboardData() {
       const today = new Date();
       const start = new Date(today); start.setHours(0, 0, 0, 0);
       const end = new Date(start); end.setDate(end.getDate() + 1);
+      const in7Days = new Date(today); in7Days.setDate(in7Days.getDate() + 7);
 
-      const [{ data: user }, medsRes, logsRes, profileRes] = await Promise.all([
+      const [{ data: user }, medsRes, logsRes, profileRes, apptsRes] = await Promise.all([
         supabase.auth.getUser(),
         supabase.from("medications").select("*").eq("active", true),
         supabase.from("medication_logs").select("*")
           .gte("scheduled_at", start.toISOString())
           .lt("scheduled_at", end.toISOString()),
         supabase.from("profiles").select("full_name").maybeSingle(),
+        supabase.from("appointments").select("*")
+          .gte("scheduled_at", today.toISOString())
+          .lte("scheduled_at", in7Days.toISOString())
+          .neq("status", "cancelado")
+          .order("scheduled_at", { ascending: true })
+          .limit(5),
       ]);
       if (medsRes.error) throw medsRes.error;
       if (logsRes.error) throw logsRes.error;
@@ -43,6 +51,7 @@ function useDashboardData() {
         userName: profileRes.data?.full_name ?? user.user?.email?.split("@")[0] ?? "",
         meds: (medsRes.data ?? []) as MedicationRow[],
         logs: (logsRes.data ?? []) as LogRow[],
+        appts: (apptsRes.data ?? []) as AppointmentRow[],
       };
     },
   });
