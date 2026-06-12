@@ -151,6 +151,31 @@ function DashboardPage() {
         </Card>
       )}
 
+      {/* Upcoming appointments */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold">Próximos compromissos</h2>
+          <Button asChild size="sm" variant="ghost">
+            <Link to="/agenda"><Plus className="w-4 h-4" /> Novo</Link>
+          </Button>
+        </div>
+        {data.appts.length === 0 ? (
+          <Card className="p-6 text-center">
+            <CalendarIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground mb-3">
+              Sem compromissos nos próximos 7 dias.
+            </p>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/agenda"><Plus className="w-4 h-4" /> Agendar</Link>
+            </Button>
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {data.appts.map((a) => <UpcomingApptRow key={a.id} appt={a} />)}
+          </div>
+        )}
+      </div>
+
       {/* Today doses */}
       <div>
         <div className="flex items-center justify-between mb-3">
