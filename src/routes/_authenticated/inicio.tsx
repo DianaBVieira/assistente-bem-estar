@@ -12,7 +12,8 @@ import {
   type LogRow,
   type ScheduledDose,
 } from "@/lib/medication-utils";
-import { Check, X, Clock, Pill, Plus, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Check, X, Clock, Pill, Plus, AlertCircle, CheckCircle2, Calendar as CalendarIcon, Stethoscope, MapPin } from "lucide-react";
+import { statusInfo, typeLabel, formatTime as formatApptTime, type AppointmentRow } from "@/lib/appointment-utils";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -27,14 +28,21 @@ function useDashboardData() {
       const today = new Date();
       const start = new Date(today); start.setHours(0, 0, 0, 0);
       const end = new Date(start); end.setDate(end.getDate() + 1);
+      const in7Days = new Date(today); in7Days.setDate(in7Days.getDate() + 7);
 
-      const [{ data: user }, medsRes, logsRes, profileRes] = await Promise.all([
+      const [{ data: user }, medsRes, logsRes, profileRes, apptsRes] = await Promise.all([
         supabase.auth.getUser(),
         supabase.from("medications").select("*").eq("active", true),
         supabase.from("medication_logs").select("*")
           .gte("scheduled_at", start.toISOString())
           .lt("scheduled_at", end.toISOString()),
         supabase.from("profiles").select("full_name").maybeSingle(),
+        supabase.from("appointments").select("*")
+          .gte("scheduled_at", today.toISOString())
+          .lte("scheduled_at", in7Days.toISOString())
+          .neq("status", "cancelado")
+          .order("scheduled_at", { ascending: true })
+          .limit(5),
       ]);
       if (medsRes.error) throw medsRes.error;
       if (logsRes.error) throw logsRes.error;
@@ -43,6 +51,7 @@ function useDashboardData() {
         userName: profileRes.data?.full_name ?? user.user?.email?.split("@")[0] ?? "",
         meds: (medsRes.data ?? []) as MedicationRow[],
         logs: (logsRes.data ?? []) as LogRow[],
+        appts: (apptsRes.data ?? []) as AppointmentRow[],
       };
     },
   });
@@ -142,6 +151,31 @@ function DashboardPage() {
         </Card>
       )}
 
+      {/* Upcoming appointments */}
+      <div>
+        <div className="flex items-center justify-between mb-3">
+          <h2 className="font-semibold">Próximos compromissos</h2>
+          <Button asChild size="sm" variant="ghost">
+            <Link to="/agenda"><Plus className="w-4 h-4" /> Novo</Link>
+          </Button>
+        </div>
+        {data.appts.length === 0 ? (
+          <Card className="p-6 text-center">
+            <CalendarIcon className="w-8 h-8 mx-auto text-muted-foreground mb-2" />
+            <p className="text-sm text-muted-foreground mb-3">
+              Sem compromissos nos próximos 7 dias.
+            </p>
+            <Button asChild size="sm" variant="outline">
+              <Link to="/agenda"><Plus className="w-4 h-4" /> Agendar</Link>
+            </Button>
+          </Card>
+        ) : (
+          <div className="space-y-2">
+            {data.appts.map((a) => <UpcomingApptRow key={a.id} appt={a} />)}
+          </div>
+        )}
+      </div>
+
       {/* Today doses */}
       <div>
         <div className="flex items-center justify-between mb-3">
@@ -175,6 +209,48 @@ function DashboardPage() {
         )}
       </div>
     </div>
+  );
+}
+
+function UpcomingApptRow({ appt }: { appt: AppointmentRow }) {
+  const info = statusInfo(appt.status);
+  const date = new Date(appt.scheduled_at);
+  const isToday = date.toDateString() === new Date().toDateString();
+  return (
+    <Link to="/agenda" className="block">
+      <Card className="p-3 hover:bg-muted/40 transition">
+        <div className="flex gap-3 items-center">
+          <div className="w-12 shrink-0 text-center">
+            <div className="text-[10px] uppercase text-muted-foreground font-medium">
+              {date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}
+            </div>
+            <div className="text-xl font-bold leading-tight">{date.getDate()}</div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold truncate">{appt.title}</p>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0 ${info.tone}`}>
+                {isToday ? "Hoje" : info.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatApptTime(appt.scheduled_at)}</span>
+              <span>{typeLabel(appt.type)}</span>
+              {appt.doctor && (
+                <span className="hidden sm:flex items-center gap-1 truncate">
+                  <Stethoscope className="w-3 h-3" />{appt.doctor}
+                </span>
+              )}
+              {appt.location && (
+                <span className="hidden md:flex items-center gap-1 truncate">
+                  <MapPin className="w-3 h-3" />{appt.location}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Link>
   );
 }
 
