@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      appointments: {
+        Row: {
+          address: string | null
+          created_at: string
+          doctor: string | null
+          duration_minutes: number
+          id: string
+          location: string | null
+          notes: string | null
+          reminder_minutes_before: number
+          scheduled_at: string
+          specialty: string | null
+          status: Database["public"]["Enums"]["appointment_status"]
+          title: string
+          type: Database["public"]["Enums"]["appointment_type"]
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          created_at?: string
+          doctor?: string | null
+          duration_minutes?: number
+          id?: string
+          location?: string | null
+          notes?: string | null
+          reminder_minutes_before?: number
+          scheduled_at: string
+          specialty?: string | null
+          status?: Database["public"]["Enums"]["appointment_status"]
+          title: string
+          type?: Database["public"]["Enums"]["appointment_type"]
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          created_at?: string
+          doctor?: string | null
+          duration_minutes?: number
+          id?: string
+          location?: string | null
+          notes?: string | null
+          reminder_minutes_before?: number
+          scheduled_at?: string
+          specialty?: string | null
+          status?: Database["public"]["Enums"]["appointment_status"]
+          title?: string
+          type?: Database["public"]["Enums"]["appointment_type"]
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       medication_logs: {
         Row: {
           created_at: string
@@ -135,6 +189,13 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      appointment_status: "agendado" | "realizado" | "cancelado" | "remarcado"
+      appointment_type:
+        | "consulta"
+        | "exame"
+        | "procedimento"
+        | "retorno"
+        | "outro"
       med_log_status: "taken" | "missed" | "late" | "skipped"
     }
     CompositeTypes: {
@@ -263,6 +324,14 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      appointment_status: ["agendado", "realizado", "cancelado", "remarcado"],
+      appointment_type: [
+        "consulta",
+        "exame",
+        "procedimento",
+        "retorno",
+        "outro",
+      ],
       med_log_status: ["taken", "missed", "late", "skipped"],
     },
   },
