@@ -212,6 +212,48 @@ function DashboardPage() {
   );
 }
 
+function UpcomingApptRow({ appt }: { appt: AppointmentRow }) {
+  const info = statusInfo(appt.status);
+  const date = new Date(appt.scheduled_at);
+  const isToday = date.toDateString() === new Date().toDateString();
+  return (
+    <Link to="/agenda" className="block">
+      <Card className="p-3 hover:bg-muted/40 transition">
+        <div className="flex gap-3 items-center">
+          <div className="w-12 shrink-0 text-center">
+            <div className="text-[10px] uppercase text-muted-foreground font-medium">
+              {date.toLocaleDateString("pt-BR", { month: "short" }).replace(".", "")}
+            </div>
+            <div className="text-xl font-bold leading-tight">{date.getDate()}</div>
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <p className="font-semibold truncate">{appt.title}</p>
+              <span className={`text-[10px] px-1.5 py-0.5 rounded font-medium shrink-0 ${info.tone}`}>
+                {isToday ? "Hoje" : info.label}
+              </span>
+            </div>
+            <div className="flex items-center gap-3 mt-0.5 text-xs text-muted-foreground">
+              <span className="flex items-center gap-1"><Clock className="w-3 h-3" />{formatApptTime(appt.scheduled_at)}</span>
+              <span>{typeLabel(appt.type)}</span>
+              {appt.doctor && (
+                <span className="hidden sm:flex items-center gap-1 truncate">
+                  <Stethoscope className="w-3 h-3" />{appt.doctor}
+                </span>
+              )}
+              {appt.location && (
+                <span className="hidden md:flex items-center gap-1 truncate">
+                  <MapPin className="w-3 h-3" />{appt.location}
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
+      </Card>
+    </Link>
+  );
+}
+
 function StatCard({ icon: Icon, value, label, tone }: {
   icon: React.ComponentType<{ className?: string }>;
   value: number;
