@@ -16,6 +16,7 @@ import { Route as AuthenticatedTarefasRouteImport } from './routes/_authenticate
 import { Route as AuthenticatedRelatoriosRouteImport } from './routes/_authenticated/relatorios'
 import { Route as AuthenticatedMedicamentosRouteImport } from './routes/_authenticated/medicamentos'
 import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated/inicio'
+import { Route as AuthenticatedAssistenteRouteImport } from './routes/_authenticated/assistente'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 
 const AuthRoute = AuthRouteImport.update({
@@ -53,6 +54,11 @@ const AuthenticatedInicioRoute = AuthenticatedInicioRouteImport.update({
   path: '/inicio',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAssistenteRoute = AuthenticatedAssistenteRouteImport.update({
+  id: '/assistente',
+  path: '/assistente',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
@@ -63,6 +69,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/assistente': typeof AuthenticatedAssistenteRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/medicamentos': typeof AuthenticatedMedicamentosRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
@@ -72,6 +79,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/auth': typeof AuthRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/assistente': typeof AuthenticatedAssistenteRoute
   '/inicio': typeof AuthenticatedInicioRoute
   '/medicamentos': typeof AuthenticatedMedicamentosRoute
   '/relatorios': typeof AuthenticatedRelatoriosRoute
@@ -83,6 +91,7 @@ export interface FileRoutesById {
   '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
   '/auth': typeof AuthRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/assistente': typeof AuthenticatedAssistenteRoute
   '/_authenticated/inicio': typeof AuthenticatedInicioRoute
   '/_authenticated/medicamentos': typeof AuthenticatedMedicamentosRoute
   '/_authenticated/relatorios': typeof AuthenticatedRelatoriosRoute
@@ -94,6 +103,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/agenda'
+    | '/assistente'
     | '/inicio'
     | '/medicamentos'
     | '/relatorios'
@@ -103,6 +113,7 @@ export interface FileRouteTypes {
     | '/'
     | '/auth'
     | '/agenda'
+    | '/assistente'
     | '/inicio'
     | '/medicamentos'
     | '/relatorios'
@@ -113,6 +124,7 @@ export interface FileRouteTypes {
     | '/_authenticated'
     | '/auth'
     | '/_authenticated/agenda'
+    | '/_authenticated/assistente'
     | '/_authenticated/inicio'
     | '/_authenticated/medicamentos'
     | '/_authenticated/relatorios'
@@ -176,6 +188,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedInicioRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/assistente': {
+      id: '/_authenticated/assistente'
+      path: '/assistente'
+      fullPath: '/assistente'
+      preLoaderRoute: typeof AuthenticatedAssistenteRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agenda': {
       id: '/_authenticated/agenda'
       path: '/agenda'
@@ -188,6 +207,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedAssistenteRoute: typeof AuthenticatedAssistenteRoute
   AuthenticatedInicioRoute: typeof AuthenticatedInicioRoute
   AuthenticatedMedicamentosRoute: typeof AuthenticatedMedicamentosRoute
   AuthenticatedRelatoriosRoute: typeof AuthenticatedRelatoriosRoute
@@ -196,6 +216,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedAssistenteRoute: AuthenticatedAssistenteRoute,
   AuthenticatedInicioRoute: AuthenticatedInicioRoute,
   AuthenticatedMedicamentosRoute: AuthenticatedMedicamentosRoute,
   AuthenticatedRelatoriosRoute: AuthenticatedRelatoriosRoute,
