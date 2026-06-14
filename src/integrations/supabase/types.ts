@@ -181,6 +181,48 @@ export type Database = {
         }
         Relationships: []
       }
+      tasks: {
+        Row: {
+          category: string | null
+          completed: boolean
+          completed_at: string | null
+          created_at: string
+          description: string | null
+          due_at: string | null
+          id: string
+          priority: Database["public"]["Enums"]["task_priority"]
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["task_priority"]
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          completed?: boolean
+          completed_at?: string | null
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          priority?: Database["public"]["Enums"]["task_priority"]
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -197,6 +239,7 @@ export type Database = {
         | "retorno"
         | "outro"
       med_log_status: "taken" | "missed" | "late" | "skipped"
+      task_priority: "baixa" | "media" | "alta"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -333,6 +376,7 @@ export const Constants = {
         "outro",
       ],
       med_log_status: ["taken", "missed", "late", "skipped"],
+      task_priority: ["baixa", "media", "alta"],
     },
   },
 } as const
