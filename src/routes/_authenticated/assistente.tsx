@@ -198,8 +198,14 @@ function MessageBubble({ msg }: { msg: Msg }) {
   return (
     <div className="flex gap-3 items-start">
       <Avatar />
-      <div className="flex-1 min-w-0 prose prose-sm max-w-none dark:prose-invert
-                      prose-p:my-2 prose-ul:my-2 prose-ol:my-2 prose-headings:my-2">
+      <div className="flex-1 min-w-0 text-sm leading-relaxed
+                      [&_p]:my-1.5 [&_ul]:my-1.5 [&_ol]:my-1.5 [&_ul]:pl-5 [&_ol]:pl-5
+                      [&_ul]:list-disc [&_ol]:list-decimal [&_li]:my-0.5
+                      [&_strong]:font-semibold [&_code]:bg-muted [&_code]:px-1 [&_code]:rounded
+                      [&_h1]:text-base [&_h1]:font-bold [&_h1]:my-2
+                      [&_h2]:text-base [&_h2]:font-semibold [&_h2]:my-2
+                      [&_h3]:font-semibold [&_h3]:my-2
+                      [&_a]:text-primary [&_a]:underline">
         <ReactMarkdown>{msg.content}</ReactMarkdown>
       </div>
     </div>
