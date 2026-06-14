@@ -68,6 +68,30 @@ export type Database = {
         }
         Relationships: []
       }
+      chat_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: Database["public"]["Enums"]["chat_role"]
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: Database["public"]["Enums"]["chat_role"]
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: Database["public"]["Enums"]["chat_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
       medication_logs: {
         Row: {
           created_at: string
@@ -238,6 +262,7 @@ export type Database = {
         | "procedimento"
         | "retorno"
         | "outro"
+      chat_role: "user" | "assistant"
       med_log_status: "taken" | "missed" | "late" | "skipped"
       task_priority: "baixa" | "media" | "alta"
     }
@@ -375,6 +400,7 @@ export const Constants = {
         "retorno",
         "outro",
       ],
+      chat_role: ["user", "assistant"],
       med_log_status: ["taken", "missed", "late", "skipped"],
       task_priority: ["baixa", "media", "alta"],
     },
