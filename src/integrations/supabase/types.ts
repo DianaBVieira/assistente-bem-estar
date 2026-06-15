@@ -92,6 +92,48 @@ export type Database = {
         }
         Relationships: []
       }
+      health_metrics: {
+        Row: {
+          created_at: string
+          id: string
+          measured_at: string
+          notes: string | null
+          text_value: string | null
+          type: Database["public"]["Enums"]["health_metric_type"]
+          updated_at: string
+          user_id: string
+          value_1: number | null
+          value_2: number | null
+          value_3: number | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          measured_at?: string
+          notes?: string | null
+          text_value?: string | null
+          type: Database["public"]["Enums"]["health_metric_type"]
+          updated_at?: string
+          user_id: string
+          value_1?: number | null
+          value_2?: number | null
+          value_3?: number | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          measured_at?: string
+          notes?: string | null
+          text_value?: string | null
+          type?: Database["public"]["Enums"]["health_metric_type"]
+          updated_at?: string
+          user_id?: string
+          value_1?: number | null
+          value_2?: number | null
+          value_3?: number | null
+        }
+        Relationships: []
+      }
       medication_logs: {
         Row: {
           created_at: string
@@ -263,6 +305,13 @@ export type Database = {
         | "retorno"
         | "outro"
       chat_role: "user" | "assistant"
+      health_metric_type:
+        | "pressao"
+        | "glicemia"
+        | "peso"
+        | "sono"
+        | "humor"
+        | "hidratacao"
       med_log_status: "taken" | "missed" | "late" | "skipped"
       task_priority: "baixa" | "media" | "alta"
     }
@@ -401,6 +450,14 @@ export const Constants = {
         "outro",
       ],
       chat_role: ["user", "assistant"],
+      health_metric_type: [
+        "pressao",
+        "glicemia",
+        "peso",
+        "sono",
+        "humor",
+        "hidratacao",
+      ],
       med_log_status: ["taken", "missed", "late", "skipped"],
       task_priority: ["baixa", "media", "alta"],
     },
