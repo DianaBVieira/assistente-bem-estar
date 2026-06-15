@@ -1,5 +1,5 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { HeartPulse, Home, Pill, Calendar, BarChart3, LogOut, ListTodo, Sparkles } from "lucide-react";
+import { HeartPulse, Home, Pill, Calendar, BarChart3, LogOut, ListTodo, Sparkles, Activity } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
@@ -9,6 +9,7 @@ const nav = [
   { to: "/medicamentos", label: "Remédios", icon: Pill },
   { to: "/agenda", label: "Agenda", icon: Calendar },
   { to: "/tarefas", label: "Tarefas", icon: ListTodo },
+  { to: "/saude", label: "Saúde", icon: Activity },
   { to: "/assistente", label: "Assistente", icon: Sparkles },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
 ] as const;
