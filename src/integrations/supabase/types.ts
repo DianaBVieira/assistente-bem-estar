@@ -170,6 +170,54 @@ export type Database = {
         }
         Relationships: []
       }
+      medical_documents: {
+        Row: {
+          category: Database["public"]["Enums"]["document_category"]
+          created_at: string
+          description: string | null
+          doctor_name: string | null
+          document_date: string | null
+          file_name: string
+          file_path: string
+          file_size: number | null
+          id: string
+          mime_type: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: Database["public"]["Enums"]["document_category"]
+          created_at?: string
+          description?: string | null
+          doctor_name?: string | null
+          document_date?: string | null
+          file_name: string
+          file_path: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: Database["public"]["Enums"]["document_category"]
+          created_at?: string
+          description?: string | null
+          doctor_name?: string | null
+          document_date?: string | null
+          file_name?: string
+          file_path?: string
+          file_size?: number | null
+          id?: string
+          mime_type?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       medical_profiles: {
         Row: {
           allergies: string | null
@@ -374,6 +422,7 @@ export type Database = {
         | "retorno"
         | "outro"
       chat_role: "user" | "assistant"
+      document_category: "receita" | "exame" | "laudo" | "outros"
       health_metric_type:
         | "pressao"
         | "glicemia"
@@ -519,6 +568,7 @@ export const Constants = {
         "outro",
       ],
       chat_role: ["user", "assistant"],
+      document_category: ["receita", "exame", "laudo", "outros"],
       health_metric_type: [
         "pressao",
         "glicemia",
