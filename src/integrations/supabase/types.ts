@@ -92,6 +92,42 @@ export type Database = {
         }
         Relationships: []
       }
+      emergency_contacts: {
+        Row: {
+          created_at: string
+          id: string
+          is_primary: boolean
+          name: string
+          phone: string
+          priority: number
+          relationship: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          name: string
+          phone: string
+          priority?: number
+          relationship?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_primary?: boolean
+          name?: string
+          phone?: string
+          priority?: number
+          relationship?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       health_metrics: {
         Row: {
           created_at: string
@@ -131,6 +167,39 @@ export type Database = {
           value_1?: number | null
           value_2?: number | null
           value_3?: number | null
+        }
+        Relationships: []
+      }
+      medical_profiles: {
+        Row: {
+          allergies: string | null
+          blood_type: string | null
+          chronic_conditions: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          allergies?: string | null
+          blood_type?: string | null
+          chronic_conditions?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          updated_at?: string
+          user_id?: string
         }
         Relationships: []
       }
