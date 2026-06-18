@@ -127,6 +127,21 @@ function MedicationsPage() {
   );
 }
 
+function StockBadge({ med }: { med: MedicationRow }) {
+  const qty = med.stock_quantity ?? 0;
+  const threshold = med.stock_threshold ?? 4;
+  if (qty === 0 && threshold === 0) return null;
+  const low = qty <= threshold;
+  return (
+    <div className={`mt-2 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded font-medium ${
+      low ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"
+    }`}>
+      {low ? <AlertTriangle className="w-3 h-3" /> : <Package className="w-3 h-3" />}
+      {qty} em estoque {low && "• comprar"}
+    </div>
+  );
+}
+
 function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null; onClose: () => void }) {
   const qc = useQueryClient();
   const [name, setName] = useState(editing?.name ?? "");
