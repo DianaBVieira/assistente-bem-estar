@@ -312,6 +312,38 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
           <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
         </div>
 
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
+            <p className="font-semibold text-sm">Controle de estoque</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="stock-qty">Quantidade</Label>
+              <Input id="stock-qty" type="number" inputMode="numeric" min={0}
+                     value={stockQuantity} onChange={(e) => setStockQuantity(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="stock-thr">Avisar com</Label>
+              <Input id="stock-thr" type="number" inputMode="numeric" min={0}
+                     value={stockThreshold} onChange={(e) => setStockThreshold(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pills-dose">Por dose</Label>
+              <Input id="pills-dose" type="number" inputMode="numeric" min={1}
+                     value={pillsPerDose} onChange={(e) => setPillsPerDose(e.target.value)} />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="alert-phone">WhatsApp para aviso (opcional)</Label>
+            <Input id="alert-phone" type="tel" placeholder="5511999999999"
+                   value={alertPhone} onChange={(e) => setAlertPhone(e.target.value)} />
+            <p className="text-xs text-muted-foreground">
+              Você receberá um link pronto quando restarem {Number(stockThreshold) || 4} comprimidos.
+            </p>
+          </div>
+        </div>
+
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
           <Button type="submit" disabled={saving}>{saving ? "Salvando…" : "Salvar"}</Button>
