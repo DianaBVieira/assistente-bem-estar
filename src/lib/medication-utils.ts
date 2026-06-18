@@ -11,6 +11,10 @@ export type MedicationRow = {
   doctor: string | null;
   notes: string | null;
   active: boolean;
+  stock_quantity: number;
+  stock_threshold: number;
+  pills_per_dose: number;
+  alert_phone: string | null;
 };
 
 export type LogRow = {

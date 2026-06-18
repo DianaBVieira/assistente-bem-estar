@@ -14,6 +14,8 @@ import {
 } from "@/lib/medication-utils";
 import { Check, X, Clock, Pill, Plus, AlertCircle, CheckCircle2, Calendar as CalendarIcon, Stethoscope, MapPin } from "lucide-react";
 import { statusInfo, typeLabel, formatTime as formatApptTime, type AppointmentRow } from "@/lib/appointment-utils";
+import { WaterReminder } from "@/components/WaterReminder";
+import { StockStatus } from "@/components/StockStatus";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
@@ -79,6 +81,7 @@ function DashboardPage() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["medications-stock"] });
       const msg = vars.status === "taken" ? "Registrado como tomado ✓" :
                   vars.status === "late" ? "Registrado como tomado atrasado" :
                   "Registrado como não tomado";
@@ -150,6 +153,9 @@ function DashboardPage() {
           </div>
         </Card>
       )}
+
+      <StockStatus />
+      <WaterReminder />
 
       {/* Upcoming appointments */}
       <div>

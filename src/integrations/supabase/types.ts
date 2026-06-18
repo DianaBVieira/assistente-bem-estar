@@ -295,6 +295,7 @@ export type Database = {
       medications: {
         Row: {
           active: boolean
+          alert_phone: string | null
           created_at: string
           doctor: string | null
           dosage: string | null
@@ -304,13 +305,17 @@ export type Database = {
           name: string
           notes: string | null
           photo_url: string | null
+          pills_per_dose: number
           start_date: string
+          stock_quantity: number
+          stock_threshold: number
           times: string[]
           updated_at: string
           user_id: string
         }
         Insert: {
           active?: boolean
+          alert_phone?: string | null
           created_at?: string
           doctor?: string | null
           dosage?: string | null
@@ -320,13 +325,17 @@ export type Database = {
           name: string
           notes?: string | null
           photo_url?: string | null
+          pills_per_dose?: number
           start_date?: string
+          stock_quantity?: number
+          stock_threshold?: number
           times?: string[]
           updated_at?: string
           user_id: string
         }
         Update: {
           active?: boolean
+          alert_phone?: string | null
           created_at?: string
           doctor?: string | null
           dosage?: string | null
@@ -336,7 +345,10 @@ export type Database = {
           name?: string
           notes?: string | null
           photo_url?: string | null
+          pills_per_dose?: number
           start_date?: string
+          stock_quantity?: number
+          stock_threshold?: number
           times?: string[]
           updated_at?: string
           user_id?: string
@@ -401,6 +413,54 @@ export type Database = {
           id?: string
           priority?: Database["public"]["Enums"]["task_priority"]
           title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      water_logs: {
+        Row: {
+          created_at: string
+          drank_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          drank_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          drank_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      water_settings: {
+        Row: {
+          created_at: string
+          daily_goal: number
+          enabled: boolean
+          interval_minutes: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          daily_goal?: number
+          enabled?: boolean
+          interval_minutes?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          daily_goal?: number
+          enabled?: boolean
+          interval_minutes?: number
           updated_at?: string
           user_id?: string
         }

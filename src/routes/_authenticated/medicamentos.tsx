@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Pill, Trash2, Pencil, Camera, X, Clock } from "lucide-react";
+import { Plus, Pill, Trash2, Pencil, Camera, X, Clock, Package, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import type { MedicationRow } from "@/lib/medication-utils";
 
@@ -108,6 +108,7 @@ function MedicationsPage() {
                 {med.doctor && (
                   <p className="text-xs text-muted-foreground mt-2">Dr(a). {med.doctor}</p>
                 )}
+                <StockBadge med={med} />
               </div>
               <div className="flex flex-col gap-1">
                 <Button size="icon" variant="ghost" onClick={() => { setEditing(med); setOpen(true); }}>
@@ -126,6 +127,21 @@ function MedicationsPage() {
   );
 }
 
+function StockBadge({ med }: { med: MedicationRow }) {
+  const qty = med.stock_quantity ?? 0;
+  const threshold = med.stock_threshold ?? 4;
+  if (qty === 0 && threshold === 0) return null;
+  const low = qty <= threshold;
+  return (
+    <div className={`mt-2 inline-flex items-center gap-1 text-[11px] px-1.5 py-0.5 rounded font-medium ${
+      low ? "bg-destructive/10 text-destructive" : "bg-muted text-muted-foreground"
+    }`}>
+      {low ? <AlertTriangle className="w-3 h-3" /> : <Package className="w-3 h-3" />}
+      {qty} em estoque {low && "• comprar"}
+    </div>
+  );
+}
+
 function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null; onClose: () => void }) {
   const qc = useQueryClient();
   const [name, setName] = useState(editing?.name ?? "");
@@ -138,6 +154,10 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
   const [notes, setNotes] = useState(editing?.notes ?? "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(editing?.photo_url ?? null);
+  const [stockQuantity, setStockQuantity] = useState<string>(String(editing?.stock_quantity ?? 0));
+  const [stockThreshold, setStockThreshold] = useState<string>(String(editing?.stock_threshold ?? 4));
+  const [pillsPerDose, setPillsPerDose] = useState<string>(String(editing?.pills_per_dose ?? 1));
+  const [alertPhone, setAlertPhone] = useState(editing?.alert_phone ?? "");
   const [saving, setSaving] = useState(false);
 
   function addTime() { setTimes([...times, "12:00"]); }
@@ -188,6 +208,10 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
         doctor: doctor.trim() || null,
         notes: notes.trim() || null,
         photo_url: photoUrl,
+        stock_quantity: Math.max(0, Number(stockQuantity) || 0),
+        stock_threshold: Math.max(0, Number(stockThreshold) || 4),
+        pills_per_dose: Math.max(1, Number(pillsPerDose) || 1),
+        alert_phone: alertPhone.trim() || null,
       };
 
       if (editing) {
@@ -201,6 +225,7 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
       }
       qc.invalidateQueries({ queryKey: ["medications"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["medications-stock"] });
       onClose();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao salvar");
@@ -285,6 +310,38 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
         <div className="space-y-1.5">
           <Label htmlFor="notes">Observações</Label>
           <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2} />
+        </div>
+
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center gap-2">
+            <Package className="w-4 h-4 text-primary" />
+            <p className="font-semibold text-sm">Controle de estoque</p>
+          </div>
+          <div className="grid grid-cols-3 gap-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="stock-qty">Quantidade</Label>
+              <Input id="stock-qty" type="number" inputMode="numeric" min={0}
+                     value={stockQuantity} onChange={(e) => setStockQuantity(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="stock-thr">Avisar com</Label>
+              <Input id="stock-thr" type="number" inputMode="numeric" min={0}
+                     value={stockThreshold} onChange={(e) => setStockThreshold(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="pills-dose">Por dose</Label>
+              <Input id="pills-dose" type="number" inputMode="numeric" min={1}
+                     value={pillsPerDose} onChange={(e) => setPillsPerDose(e.target.value)} />
+            </div>
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="alert-phone">WhatsApp para aviso (opcional)</Label>
+            <Input id="alert-phone" type="tel" placeholder="5511999999999"
+                   value={alertPhone} onChange={(e) => setAlertPhone(e.target.value)} />
+            <p className="text-xs text-muted-foreground">
+              Você receberá um link pronto quando restarem {Number(stockThreshold) || 4} comprimidos.
+            </p>
+          </div>
         </div>
 
         <DialogFooter>

@@ -1,0 +1,1 @@
+REVOKE EXECUTE ON FUNCTION public.decrement_med_stock() FROM PUBLIC, anon, authenticated;
