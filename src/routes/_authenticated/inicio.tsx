@@ -153,6 +153,9 @@ function DashboardPage() {
         </Card>
       )}
 
+      <StockStatus />
+      <WaterReminder />
+
       {/* Upcoming appointments */}
       <div>
         <div className="flex items-center justify-between mb-3">
