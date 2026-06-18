@@ -225,6 +225,7 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
       }
       qc.invalidateQueries({ queryKey: ["medications"] });
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["medications-stock"] });
       onClose();
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Erro ao salvar");
