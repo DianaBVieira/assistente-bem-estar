@@ -154,6 +154,10 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
   const [notes, setNotes] = useState(editing?.notes ?? "");
   const [photoFile, setPhotoFile] = useState<File | null>(null);
   const [photoPreview, setPhotoPreview] = useState<string | null>(editing?.photo_url ?? null);
+  const [stockQuantity, setStockQuantity] = useState<string>(String(editing?.stock_quantity ?? 0));
+  const [stockThreshold, setStockThreshold] = useState<string>(String(editing?.stock_threshold ?? 4));
+  const [pillsPerDose, setPillsPerDose] = useState<string>(String(editing?.pills_per_dose ?? 1));
+  const [alertPhone, setAlertPhone] = useState(editing?.alert_phone ?? "");
   const [saving, setSaving] = useState(false);
 
   function addTime() { setTimes([...times, "12:00"]); }
@@ -204,6 +208,10 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
         doctor: doctor.trim() || null,
         notes: notes.trim() || null,
         photo_url: photoUrl,
+        stock_quantity: Math.max(0, Number(stockQuantity) || 0),
+        stock_threshold: Math.max(0, Number(stockThreshold) || 4),
+        pills_per_dose: Math.max(1, Number(pillsPerDose) || 1),
+        alert_phone: alertPhone.trim() || null,
       };
 
       if (editing) {
