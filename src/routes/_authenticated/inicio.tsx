@@ -14,6 +14,8 @@ import {
 } from "@/lib/medication-utils";
 import { Check, X, Clock, Pill, Plus, AlertCircle, CheckCircle2, Calendar as CalendarIcon, Stethoscope, MapPin } from "lucide-react";
 import { statusInfo, typeLabel, formatTime as formatApptTime, type AppointmentRow } from "@/lib/appointment-utils";
+import { WaterReminder } from "@/components/WaterReminder";
+import { StockStatus } from "@/components/StockStatus";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/_authenticated/inicio")({
