@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Pill, Trash2, Pencil, Camera, X, Clock } from "lucide-react";
+import { Plus, Pill, Trash2, Pencil, Camera, X, Clock, Package, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 import type { MedicationRow } from "@/lib/medication-utils";
 
@@ -108,6 +108,7 @@ function MedicationsPage() {
                 {med.doctor && (
                   <p className="text-xs text-muted-foreground mt-2">Dr(a). {med.doctor}</p>
                 )}
+                <StockBadge med={med} />
               </div>
               <div className="flex flex-col gap-1">
                 <Button size="icon" variant="ghost" onClick={() => { setEditing(med); setOpen(true); }}>
