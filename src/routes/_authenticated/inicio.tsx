@@ -81,6 +81,7 @@ function DashboardPage() {
     },
     onSuccess: (_, vars) => {
       qc.invalidateQueries({ queryKey: ["dashboard"] });
+      qc.invalidateQueries({ queryKey: ["medications-stock"] });
       const msg = vars.status === "taken" ? "Registrado como tomado ✓" :
                   vars.status === "late" ? "Registrado como tomado atrasado" :
                   "Registrado como não tomado";
