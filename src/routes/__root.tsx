@@ -13,6 +13,7 @@ import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
 import { supabase } from "@/integrations/supabase/client";
 import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 import { registerServiceWorker } from "@/lib/pwa/register";
 
 function NotFoundComponent() {
@@ -147,7 +148,18 @@ function RootComponent() {
   }, [router, queryClient]);
 
   useEffect(() => {
-    registerServiceWorker();
+    registerServiceWorker((apply) => {
+      toast("Nova versão disponível", {
+        description: "Atualize para receber as últimas melhorias. Seus dados serão mantidos.",
+        duration: Infinity,
+        action: {
+          label: "Atualizar",
+          onClick: () => {
+            void apply();
+          },
+        },
+      });
+    });
   }, []);
 
   return (

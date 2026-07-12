@@ -1,7 +1,9 @@
-// Guarded service worker registration.
+// Guarded service worker registration + update notifier.
 // Never registers in dev, iframe, Lovable preview, or when ?sw=off is present.
 
 const SW_URL = "/sw.js";
+
+type UpdateHandler = (apply: () => Promise<void>) => void;
 
 function isRefusedContext(): boolean {
   if (!import.meta.env.PROD) return true;
@@ -37,7 +39,7 @@ async function unregisterMatching(): Promise<void> {
   }
 }
 
-export function registerServiceWorker(): void {
+export function registerServiceWorker(onUpdate?: UpdateHandler): void {
   if (typeof window === "undefined") return;
   if (isRefusedContext()) {
     void unregisterMatching();
@@ -45,9 +47,15 @@ export function registerServiceWorker(): void {
   }
   if (!("serviceWorker" in navigator)) return;
 
-  window.addEventListener("load", () => {
-    navigator.serviceWorker.register(SW_URL, { scope: "/" }).catch(() => {
-      /* ignore registration errors */
+  // Dynamic import so dev/preview never pulls the virtual module.
+  void import("virtual:pwa-register").then(({ registerSW }) => {
+    const updateSW = registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        onUpdate?.(async () => {
+          await updateSW(true);
+        });
+      },
     });
   });
 }
