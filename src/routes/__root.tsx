@@ -148,7 +148,18 @@ function RootComponent() {
   }, [router, queryClient]);
 
   useEffect(() => {
-    registerServiceWorker();
+    registerServiceWorker((apply) => {
+      toast("Nova versão disponível", {
+        description: "Atualize para receber as últimas melhorias. Seus dados serão mantidos.",
+        duration: Infinity,
+        action: {
+          label: "Atualizar",
+          onClick: () => {
+            void apply();
+          },
+        },
+      });
+    });
   }, []);
 
   return (
