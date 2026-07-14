@@ -14,6 +14,54 @@ export type Database = {
   }
   public: {
     Tables: {
+      alarm_settings: {
+        Row: {
+          created_at: string
+          custom_sound_url: string | null
+          default_sound: string
+          enabled: boolean
+          push_enabled: boolean
+          ring_seconds: number
+          snooze_minutes: number
+          tts_enabled: boolean
+          tts_voice: string
+          updated_at: string
+          user_id: string
+          vibrate: boolean
+          volume: number
+        }
+        Insert: {
+          created_at?: string
+          custom_sound_url?: string | null
+          default_sound?: string
+          enabled?: boolean
+          push_enabled?: boolean
+          ring_seconds?: number
+          snooze_minutes?: number
+          tts_enabled?: boolean
+          tts_voice?: string
+          updated_at?: string
+          user_id: string
+          vibrate?: boolean
+          volume?: number
+        }
+        Update: {
+          created_at?: string
+          custom_sound_url?: string | null
+          default_sound?: string
+          enabled?: boolean
+          push_enabled?: boolean
+          ring_seconds?: number
+          snooze_minutes?: number
+          tts_enabled?: boolean
+          tts_voice?: string
+          updated_at?: string
+          user_id?: string
+          vibrate?: boolean
+          volume?: number
+        }
+        Relationships: []
+      }
       appointments: {
         Row: {
           address: string | null

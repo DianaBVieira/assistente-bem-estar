@@ -1,8 +1,10 @@
 import { Link, useNavigate, useRouterState } from "@tanstack/react-router";
-import { HeartPulse, Home, Pill, Calendar, BarChart3, LogOut, ListTodo, Sparkles, Activity, Siren, FileText } from "lucide-react";
+import { HeartPulse, Home, Pill, Calendar, BarChart3, LogOut, ListTodo, Sparkles, Activity, Siren, FileText, BellRing } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
+import { AlarmProvider } from "@/lib/alarm/engine";
+import { AlarmOverlay } from "@/components/AlarmOverlay";
 
 import {
   Sidebar,
@@ -27,6 +29,7 @@ const nav = [
   { to: "/tarefas", label: "Tarefas", icon: ListTodo },
   { to: "/saude", label: "Saúde", icon: Activity },
   { to: "/documentos", label: "Docs", icon: FileText },
+  { to: "/alarmes", label: "Alarmes", icon: BellRing },
   { to: "/assistente", label: "Assistente", icon: Sparkles },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/emergencia", label: "SOS", icon: Siren },
@@ -76,6 +79,8 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
+    <AlarmProvider>
+    <>
     <SidebarProvider defaultOpen>
       <Sidebar collapsible="icon" variant="sidebar">
         <SidebarHeader>
@@ -160,7 +165,10 @@ export function AppShell({ children }: { children: ReactNode }) {
         <main className="mx-auto w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8 lg:py-8">
           {children}
         </main>
-      </SidebarInset>
+    </SidebarInset>
     </SidebarProvider>
+    <AlarmOverlay />
+    </>
+    </AlarmProvider>
   );
 }

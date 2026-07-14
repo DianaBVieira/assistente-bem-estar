@@ -21,6 +21,7 @@ import { Route as AuthenticatedInicioRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedEmergenciaRouteImport } from './routes/_authenticated/emergencia'
 import { Route as AuthenticatedDocumentosRouteImport } from './routes/_authenticated/documentos'
 import { Route as AuthenticatedAssistenteRouteImport } from './routes/_authenticated/assistente'
+import { Route as AuthenticatedAlarmesRouteImport } from './routes/_authenticated/alarmes'
 import { Route as AuthenticatedAgendaRouteImport } from './routes/_authenticated/agenda'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
@@ -83,6 +84,11 @@ const AuthenticatedAssistenteRoute = AuthenticatedAssistenteRouteImport.update({
   path: '/assistente',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedAlarmesRoute = AuthenticatedAlarmesRouteImport.update({
+  id: '/alarmes',
+  path: '/alarmes',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
 const AuthenticatedAgendaRoute = AuthenticatedAgendaRouteImport.update({
   id: '/agenda',
   path: '/agenda',
@@ -94,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/alarmes': typeof AuthenticatedAlarmesRoute
   '/assistente': typeof AuthenticatedAssistenteRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/emergencia': typeof AuthenticatedEmergenciaRoute
@@ -108,6 +115,7 @@ export interface FileRoutesByTo {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/agenda': typeof AuthenticatedAgendaRoute
+  '/alarmes': typeof AuthenticatedAlarmesRoute
   '/assistente': typeof AuthenticatedAssistenteRoute
   '/documentos': typeof AuthenticatedDocumentosRoute
   '/emergencia': typeof AuthenticatedEmergenciaRoute
@@ -124,6 +132,7 @@ export interface FileRoutesById {
   '/auth': typeof AuthRoute
   '/reset-password': typeof ResetPasswordRoute
   '/_authenticated/agenda': typeof AuthenticatedAgendaRoute
+  '/_authenticated/alarmes': typeof AuthenticatedAlarmesRoute
   '/_authenticated/assistente': typeof AuthenticatedAssistenteRoute
   '/_authenticated/documentos': typeof AuthenticatedDocumentosRoute
   '/_authenticated/emergencia': typeof AuthenticatedEmergenciaRoute
@@ -140,6 +149,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/agenda'
+    | '/alarmes'
     | '/assistente'
     | '/documentos'
     | '/emergencia'
@@ -154,6 +164,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/agenda'
+    | '/alarmes'
     | '/assistente'
     | '/documentos'
     | '/emergencia'
@@ -169,6 +180,7 @@ export interface FileRouteTypes {
     | '/auth'
     | '/reset-password'
     | '/_authenticated/agenda'
+    | '/_authenticated/alarmes'
     | '/_authenticated/assistente'
     | '/_authenticated/documentos'
     | '/_authenticated/emergencia'
@@ -272,6 +284,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAssistenteRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/alarmes': {
+      id: '/_authenticated/alarmes'
+      path: '/alarmes'
+      fullPath: '/alarmes'
+      preLoaderRoute: typeof AuthenticatedAlarmesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/agenda': {
       id: '/_authenticated/agenda'
       path: '/agenda'
@@ -284,6 +303,7 @@ declare module '@tanstack/react-router' {
 
 interface AuthenticatedRouteRouteChildren {
   AuthenticatedAgendaRoute: typeof AuthenticatedAgendaRoute
+  AuthenticatedAlarmesRoute: typeof AuthenticatedAlarmesRoute
   AuthenticatedAssistenteRoute: typeof AuthenticatedAssistenteRoute
   AuthenticatedDocumentosRoute: typeof AuthenticatedDocumentosRoute
   AuthenticatedEmergenciaRoute: typeof AuthenticatedEmergenciaRoute
@@ -296,6 +316,7 @@ interface AuthenticatedRouteRouteChildren {
 
 const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAgendaRoute: AuthenticatedAgendaRoute,
+  AuthenticatedAlarmesRoute: AuthenticatedAlarmesRoute,
   AuthenticatedAssistenteRoute: AuthenticatedAssistenteRoute,
   AuthenticatedDocumentosRoute: AuthenticatedDocumentosRoute,
   AuthenticatedEmergenciaRoute: AuthenticatedEmergenciaRoute,
