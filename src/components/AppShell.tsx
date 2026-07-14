@@ -80,6 +80,7 @@ export function AppShell({ children }: { children: ReactNode }) {
 
   return (
     <AlarmProvider>
+    <>
     <SidebarProvider defaultOpen>
       <Sidebar collapsible="icon" variant="sidebar">
         <SidebarHeader>
@@ -167,6 +168,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     </SidebarInset>
     </SidebarProvider>
     <AlarmOverlay />
+    </>
     </AlarmProvider>
   );
 }
