@@ -72,6 +72,21 @@ function AuthPage() {
     }
   }
 
+  async function handleGoogle() {
+    setLoading(true);
+    try {
+      const result = await lovable.auth.signInWithOAuth("google", {
+        redirect_uri: window.location.origin,
+      });
+      if (result.error) throw result.error;
+      if (result.redirected) return;
+      navigate({ to: "/inicio", replace: true });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Erro ao entrar com Google");
+      setLoading(false);
+    }
+  }
+
   const title = mode === "forgot" ? "Recuperar senha" : mode === "signup" ? "Criar conta" : "Entrar";
 
   return (
