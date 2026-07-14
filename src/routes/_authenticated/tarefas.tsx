@@ -14,10 +14,11 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle2, Plus, Trash2, Pencil, ListTodo, Droplet, Footprints,
-  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon,
+  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 
