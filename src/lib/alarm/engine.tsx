@@ -69,6 +69,20 @@ function saveFired(m: FiredMap) {
   }
 }
 
+function parseWindow(
+  start: string | null | undefined,
+  end: string | null | undefined,
+): [{ h: number; m: number }, { h: number; m: number }] {
+  const parse = (s: string, fb: { h: number; m: number }) => {
+    if (!s) return fb;
+    const [h, m] = s.split(":").map(Number);
+    if (Number.isNaN(h)) return fb;
+    return { h, m: m || 0 };
+  };
+  return [parse(start ?? "", { h: 8, m: 0 }), parse(end ?? "", { h: 22, m: 0 })];
+}
+
+
 async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   const now = new Date();
   const horizon = new Date(now.getTime() + 10 * 60 * 1000); // 10 min ahead
@@ -82,12 +96,11 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
       .eq("active", true),
     supabase
       .from("tasks")
-      .select("id,title,due_at,completed,alarm_enabled,alarm_message")
+      .select("id,title,due_at,completed,alarm_enabled,alarm_message,recurrence_type,interval_minutes,window_start,window_end,weekdays,times_of_day")
       .eq("user_id", userId)
-      .eq("completed", false)
-      .not("due_at", "is", null)
-      .gte("due_at", now.toISOString())
-      .lte("due_at", horizon.toISOString()),
+      .or(
+        `and(recurrence_type.eq.none,completed.eq.false,due_at.gte.${now.toISOString()},due_at.lte.${horizon.toISOString()}),recurrence_type.neq.none`,
+      ),
     supabase
       .from("appointments")
       .select("id,title,doctor,location,scheduled_at,reminder_minutes_before,status,alarm_enabled,alarm_message")
@@ -126,18 +139,70 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   }
 
   for (const task of tasksRes.data ?? []) {
-    if (!task.due_at) continue;
     if (task.alarm_enabled === false) continue;
-    const dt = new Date(task.due_at);
     const defaultSpeech = `Lembrete de tarefa: ${task.title}.`;
-    out.push({
-      key: `task:${task.id}:${dt.toISOString()}`,
-      kind: "task",
-      title: task.title,
-      subtitle: "Tarefa",
-      scheduledAt: dt,
-      speech: (task.alarm_message?.trim() || defaultSpeech),
-    });
+    const speech = task.alarm_message?.trim() || defaultSpeech;
+    const rtype = (task.recurrence_type ?? "none") as "none" | "interval" | "weekly";
+
+    if (rtype === "none") {
+      if (!task.due_at) continue;
+      const dt = new Date(task.due_at);
+      out.push({
+        key: `task:${task.id}:${dt.toISOString()}`,
+        kind: "task",
+        title: task.title,
+        subtitle: "Tarefa",
+        scheduledAt: dt,
+        speech,
+      });
+      continue;
+    }
+
+    // Recurring: enumerate candidate times within [now-FIRE_WINDOW, horizon]
+    const dow = now.getDay();
+    const weekdays = (task.weekdays ?? []) as number[];
+    if (weekdays.length > 0 && !weekdays.includes(dow)) continue;
+
+    const candidates: Date[] = [];
+    if (rtype === "interval") {
+      const step = Math.max(1, task.interval_minutes ?? 60);
+      const [ws, we] = parseWindow(task.window_start, task.window_end);
+      const startDt = new Date(now);
+      startDt.setHours(ws.h, ws.m, 0, 0);
+      const endDt = new Date(now);
+      endDt.setHours(we.h, we.m, 0, 0);
+      // step through the day
+      for (
+        let t = startDt.getTime();
+        t <= endDt.getTime();
+        t += step * 60_000
+      ) {
+        if (t < now.getTime() - FIRE_WINDOW_MS) continue;
+        if (t > horizon.getTime()) break;
+        candidates.push(new Date(t));
+      }
+    } else if (rtype === "weekly") {
+      for (const t of (task.times_of_day ?? []) as string[]) {
+        const [h, m] = t.split(":").map(Number);
+        if (Number.isNaN(h)) continue;
+        const dt = new Date(now);
+        dt.setHours(h, m || 0, 0, 0);
+        if (dt.getTime() < now.getTime() - FIRE_WINDOW_MS) continue;
+        if (dt.getTime() > horizon.getTime()) continue;
+        candidates.push(dt);
+      }
+    }
+
+    for (const dt of candidates) {
+      out.push({
+        key: `task:${task.id}:${dt.toISOString()}`,
+        kind: "task",
+        title: task.title,
+        subtitle: "Tarefa",
+        scheduledAt: dt,
+        speech,
+      });
+    }
   }
 
   for (const a of apptsRes.data ?? []) {

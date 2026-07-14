@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle2, Plus, Trash2, Pencil, ListTodo, Droplet, Footprints,
-  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon, Bell,
+  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon, Bell, RotateCw,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -28,6 +28,7 @@ export const Route = createFileRoute("/_authenticated/tarefas")({
 });
 
 type Priority = "baixa" | "media" | "alta";
+type RecurrenceType = "none" | "interval" | "weekly";
 type TaskRow = {
   id: string;
   user_id: string;
@@ -41,6 +42,12 @@ type TaskRow = {
   created_at: string;
   alarm_enabled?: boolean;
   alarm_message?: string | null;
+  recurrence_type?: RecurrenceType;
+  interval_minutes?: number | null;
+  window_start?: string | null;
+  window_end?: string | null;
+  weekdays?: number[];
+  times_of_day?: string[];
 };
 
 const PRIORITY_LABEL: Record<Priority, string> = { baixa: "Baixa", media: "Média", alta: "Alta" };
@@ -81,6 +88,34 @@ function formatDue(iso: string | null): string {
   if (diff === -1) return `Ontem • ${time}`;
   if (diff < 0) return `Atrasada • ${d.toLocaleDateString("pt-BR")}`;
   return `${d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} • ${time}`;
+}
+
+const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+function formatRecurrence(t: TaskRow): string | null {
+  const type = t.recurrence_type ?? "none";
+  if (type === "none") return null;
+  const daysPart = () => {
+    const days = t.weekdays ?? [];
+    if (days.length === 0 || days.length === 7) return "todos os dias";
+    const workdays = [1, 2, 3, 4, 5];
+    const weekend = [0, 6];
+    const sorted = [...days].sort();
+    if (sorted.length === 5 && workdays.every((d) => sorted.includes(d)))
+      return "seg a sex";
+    if (sorted.length === 2 && weekend.every((d) => sorted.includes(d)))
+      return "fins de semana";
+    return sorted.map((d) => WEEKDAY_LABELS[d]).join(", ");
+  };
+  if (type === "interval") {
+    const mins = t.interval_minutes ?? 60;
+    const label =
+      mins % 60 === 0 ? `${mins / 60}h` : mins >= 60 ? `${(mins / 60).toFixed(1)}h` : `${mins} min`;
+    const w = `${(t.window_start ?? "08:00").slice(0, 5)}–${(t.window_end ?? "22:00").slice(0, 5)}`;
+    return `A cada ${label} • ${w} • ${daysPart()}`;
+  }
+  const times = (t.times_of_day ?? []).map((s) => s.slice(0, 5)).join(", ") || "—";
+  return `${daysPart()} às ${times}`;
 }
 
 function TasksPage() {
@@ -251,6 +286,7 @@ function TaskItem({ task, onToggle, onEdit, onDelete }: {
   onDelete: () => void;
 }) {
   const overdue = !task.completed && task.due_at && new Date(task.due_at) < new Date();
+  const rec = formatRecurrence(task);
   return (
     <Card className="p-3">
       <div className="flex items-start gap-3">
@@ -268,14 +304,26 @@ function TaskItem({ task, onToggle, onEdit, onDelete }: {
                 {task.category}
               </span>
             )}
+            {rec && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-primary-soft text-primary flex items-center gap-1">
+                <RotateCw className="w-3 h-3" /> Recorrente
+              </span>
+            )}
           </div>
           {task.description && (
             <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{task.description}</p>
           )}
-          <p className={`text-xs mt-1 ${overdue ? "text-destructive font-medium" : "text-muted-foreground"}`}>
-            <CalendarIcon className="w-3 h-3 inline mr-1" />
-            {formatDue(task.due_at)}
-          </p>
+          {rec ? (
+            <p className="text-xs mt-1 text-muted-foreground">
+              <RotateCw className="w-3 h-3 inline mr-1" />
+              {rec}
+            </p>
+          ) : (
+            <p className={`text-xs mt-1 ${overdue ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+              <CalendarIcon className="w-3 h-3 inline mr-1" />
+              {formatDue(task.due_at)}
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <Button size="icon" variant="ghost" onClick={onEdit} aria-label="Editar">
@@ -304,6 +352,12 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
   const defaultTaskMsg = (t: string) => `Lembrete de tarefa: ${t || "sua tarefa"}.`;
   const [alarmEnabled, setAlarmEnabled] = useState(true);
   const [alarmMessage, setAlarmMessage] = useState("");
+  const [recurrence, setRecurrence] = useState<RecurrenceType>("none");
+  const [intervalMinutes, setIntervalMinutes] = useState<number>(60);
+  const [windowStart, setWindowStart] = useState("08:00");
+  const [windowEnd, setWindowEnd] = useState("22:00");
+  const [weekdays, setWeekdays] = useState<number[]>([1, 2, 3, 4, 5]);
+  const [timesOfDay, setTimesOfDay] = useState<string[]>(["08:00"]);
   const [saving, setSaving] = useState(false);
 
   // reset when opening
@@ -316,11 +370,41 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
       setDueAt(toLocalInput(editing?.due_at ?? null));
       setAlarmEnabled(editing?.alarm_enabled ?? true);
       setAlarmMessage(editing?.alarm_message ?? defaultTaskMsg(editing?.title ?? ""));
+      setRecurrence((editing?.recurrence_type as RecurrenceType) ?? "none");
+      setIntervalMinutes(editing?.interval_minutes ?? 60);
+      setWindowStart((editing?.window_start ?? "08:00").slice(0, 5));
+      setWindowEnd((editing?.window_end ?? "22:00").slice(0, 5));
+      setWeekdays(editing?.weekdays?.length ? editing.weekdays : [1, 2, 3, 4, 5]);
+      setTimesOfDay(
+        editing?.times_of_day?.length
+          ? editing.times_of_day.map((s) => s.slice(0, 5))
+          : ["08:00"],
+      );
     }
   }, [open, editing]);
 
+  function toggleWeekday(d: number) {
+    setWeekdays((prev) => (prev.includes(d) ? prev.filter((x) => x !== d) : [...prev, d].sort()));
+  }
+  function updateTime(idx: number, val: string) {
+    setTimesOfDay((prev) => prev.map((t, i) => (i === idx ? val : t)));
+  }
+  function addTime() {
+    setTimesOfDay((prev) => [...prev, "12:00"]);
+  }
+  function removeTime(idx: number) {
+    setTimesOfDay((prev) => (prev.length > 1 ? prev.filter((_, i) => i !== idx) : prev));
+  }
+
   async function handleSave() {
     if (!title.trim()) { toast.error("Informe o título"); return; }
+    if (recurrence === "interval" && (!intervalMinutes || intervalMinutes < 1)) {
+      toast.error("Informe o intervalo em minutos"); return;
+    }
+    if (recurrence === "weekly") {
+      if (weekdays.length === 0) { toast.error("Escolha ao menos um dia da semana"); return; }
+      if (timesOfDay.length === 0) { toast.error("Adicione ao menos um horário"); return; }
+    }
     setSaving(true);
     try {
       const { data: u } = await supabase.auth.getUser();
@@ -330,9 +414,15 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
         description: description.trim() || null,
         category: category.trim() || null,
         priority,
-        due_at: fromLocalInput(dueAt),
+        due_at: recurrence === "none" ? fromLocalInput(dueAt) : null,
         alarm_enabled: alarmEnabled,
         alarm_message: alarmMessage.trim() || defaultTaskMsg(title),
+        recurrence_type: recurrence,
+        interval_minutes: recurrence === "interval" ? intervalMinutes : null,
+        window_start: recurrence === "interval" ? windowStart : null,
+        window_end: recurrence === "interval" ? windowEnd : null,
+        weekdays: recurrence === "none" ? [] : weekdays,
+        times_of_day: recurrence === "weekly" ? timesOfDay : [],
       };
       if (editing) {
         const { error } = await supabase.from("tasks").update(payload).eq("id", editing.id);
@@ -354,7 +444,7 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{editing ? "Editar tarefa" : "Nova tarefa"}</DialogTitle>
         </DialogHeader>
@@ -365,7 +455,7 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
           </div>
           <div>
             <Label htmlFor="t-desc">Descrição</Label>
-            <Textarea id="t-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+            <Textarea id="t-desc" value={description} onChange={(e) => setDescription(e.target.value)} rows={2} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
@@ -384,10 +474,95 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
               </Select>
             </div>
           </div>
-          <div>
-            <Label htmlFor="t-due">Prazo</Label>
-            <Input id="t-due" type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
+
+          <div className="border-t pt-3 space-y-2">
+            <div className="flex items-center gap-2">
+              <RotateCw className="w-4 h-4 text-primary" />
+              <p className="font-semibold text-sm">Quando fazer</p>
+            </div>
+            <Tabs value={recurrence} onValueChange={(v) => setRecurrence(v as RecurrenceType)}>
+              <TabsList className="grid grid-cols-3 w-full">
+                <TabsTrigger value="none">Uma vez</TabsTrigger>
+                <TabsTrigger value="interval">Intervalo</TabsTrigger>
+                <TabsTrigger value="weekly">Semanal</TabsTrigger>
+              </TabsList>
+            </Tabs>
+
+            {recurrence === "none" && (
+              <div>
+                <Label htmlFor="t-due">Prazo</Label>
+                <Input id="t-due" type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
+              </div>
+            )}
+
+            {recurrence === "interval" && (
+              <div className="space-y-3">
+                <div>
+                  <Label>Repetir a cada</Label>
+                  <div className="flex gap-2 flex-wrap mt-1">
+                    {[15, 30, 60, 90, 120, 180, 240].map((m) => (
+                      <button
+                        key={m}
+                        type="button"
+                        onClick={() => setIntervalMinutes(m)}
+                        className={`px-3 py-1.5 rounded-full text-xs border transition ${
+                          intervalMinutes === m
+                            ? "bg-primary text-primary-foreground border-primary"
+                            : "bg-card border-border hover:bg-muted"
+                        }`}
+                      >
+                        {m < 60 ? `${m} min` : `${m / 60}h`}
+                      </button>
+                    ))}
+                  </div>
+                  <Input
+                    type="number" min={1} className="mt-2"
+                    value={intervalMinutes}
+                    onChange={(e) => setIntervalMinutes(Number(e.target.value))}
+                    placeholder="Minutos personalizados"
+                  />
+                </div>
+                <div className="grid grid-cols-2 gap-3">
+                  <div>
+                    <Label htmlFor="t-ws">Começar às</Label>
+                    <Input id="t-ws" type="time" value={windowStart} onChange={(e) => setWindowStart(e.target.value)} />
+                  </div>
+                  <div>
+                    <Label htmlFor="t-we">Terminar às</Label>
+                    <Input id="t-we" type="time" value={windowEnd} onChange={(e) => setWindowEnd(e.target.value)} />
+                  </div>
+                </div>
+                <WeekdayPicker value={weekdays} onChange={setWeekdays} optional />
+              </div>
+            )}
+
+            {recurrence === "weekly" && (
+              <div className="space-y-3">
+                <WeekdayPicker value={weekdays} onChange={setWeekdays} />
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <Label>Horários</Label>
+                    <Button type="button" size="sm" variant="ghost" onClick={addTime}>
+                      <Plus className="w-3 h-3" /> Adicionar
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {timesOfDay.map((t, i) => (
+                      <div key={i} className="flex gap-2">
+                        <Input type="time" value={t} onChange={(e) => updateTime(i, e.target.value)} />
+                        {timesOfDay.length > 1 && (
+                          <Button type="button" size="icon" variant="ghost" onClick={() => removeTime(i)}>
+                            <Trash2 className="w-4 h-4 text-destructive" />
+                          </Button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+
           <div className="border-t pt-3 space-y-2">
             <div className="flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
@@ -413,3 +588,38 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
     </Dialog>
   );
 }
+
+function WeekdayPicker({
+  value, onChange, optional = false,
+}: { value: number[]; onChange: (v: number[]) => void; optional?: boolean }) {
+  function toggle(d: number) {
+    onChange(value.includes(d) ? value.filter((x) => x !== d) : [...value, d].sort());
+  }
+  return (
+    <div>
+      <div className="flex items-center justify-between mb-1">
+        <Label>Dias da semana {optional && <span className="text-muted-foreground text-xs font-normal">(opcional — vazio = todos)</span>}</Label>
+        <div className="flex gap-1">
+          <button type="button" onClick={() => onChange([1, 2, 3, 4, 5])}
+            className="text-[10px] px-2 py-0.5 rounded border border-border hover:bg-muted">Seg-Sex</button>
+          <button type="button" onClick={() => onChange([0, 1, 2, 3, 4, 5, 6])}
+            className="text-[10px] px-2 py-0.5 rounded border border-border hover:bg-muted">Todos</button>
+        </div>
+      </div>
+      <div className="flex gap-1 flex-wrap">
+        {WEEKDAY_LABELS.map((label, d) => {
+          const on = value.includes(d);
+          return (
+            <button key={d} type="button" onClick={() => toggle(d)}
+              className={`px-3 py-1.5 rounded-full text-xs border transition ${
+                on ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border hover:bg-muted"
+              }`}>
+              {label}
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
