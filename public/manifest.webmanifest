@@ -1,35 +1,35 @@
 {
-  "name": "Minha Rotina — Assistente pessoal de saúde",
-  "short_name": "Minha Rotina",
-  "description": "Organize seus medicamentos, horários e adesão diária com lembretes claros.",
+  "name": "Pulso Utopia",
+  "short_name": "Pulso Utopia",
+  "description": "Pulso Utopia — seu assistente pessoal de bem-estar, medicamentos e rotina.",
   "start_url": "/inicio",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#ffffff",
-  "theme_color": "#0ea5e9",
+  "background_color": "#F8F7F5",
+  "theme_color": "#3E2B63",
   "lang": "pt-BR",
   "icons": [
     {
-      "src": "/__l5e/assets-v1/ada48a0a-fda0-474a-a79f-8592066ac5cf/icon-192.png",
+      "src": "/__l5e/assets-v1/b1a2dff9-06d3-4bf8-a786-1affd99b347e/pulso-utopia-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/__l5e/assets-v1/e5d4d894-6597-4968-8b4f-1fd0ddde76db/icon-512.png",
+      "src": "/__l5e/assets-v1/b1a2dff9-06d3-4bf8-a786-1affd99b347e/pulso-utopia-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any"
     },
     {
-      "src": "/__l5e/assets-v1/ac52db7e-85a6-4306-9ab9-842a99875673/icon-maskable-192.png",
+      "src": "/__l5e/assets-v1/b1a2dff9-06d3-4bf8-a786-1affd99b347e/pulso-utopia-icon.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "maskable"
     },
     {
-      "src": "/__l5e/assets-v1/b52be073-e1c1-487c-b534-754b4fbb70e4/icon-maskable-512.png",
+      "src": "/__l5e/assets-v1/b1a2dff9-06d3-4bf8-a786-1affd99b347e/pulso-utopia-icon.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "maskable"
