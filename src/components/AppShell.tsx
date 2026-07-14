@@ -23,7 +23,9 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-const nav = [
+type IconComp = React.ComponentType<React.SVGProps<SVGSVGElement>>;
+
+const nav: ReadonlyArray<{ to: string; label: string; icon: IconComp }> = [
   { to: "/inicio", label: "Início", icon: Home },
   { to: "/medicamentos", label: "Remédios", icon: Pill },
   { to: "/agenda", label: "Agenda", icon: Calendar },
@@ -34,7 +36,7 @@ const nav = [
   { to: "/assistente", label: "Assistente", icon: Sparkles },
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/emergencia", label: "SOS", icon: Siren },
-] as const;
+];
 
 function NavLink({
   to,
@@ -44,7 +46,7 @@ function NavLink({
 }: {
   to: string;
   label: string;
-  icon: React.ComponentType<{ className?: string }>;
+  icon: IconComp;
   active: boolean;
 }) {
   const { isMobile, setOpenMobile } = useSidebar();
@@ -81,12 +83,12 @@ function useUserProfile() {
       if (!user) return null;
       const { data: profile } = await supabase
         .from("profiles")
-        .select("full_name, avatar_url")
+        .select("full_name")
         .maybeSingle();
-      const fullName = profile?.full_name || user.email?.split("@")[0] || "Você";
+      const fullName = (profile?.full_name as string | undefined) || user.email?.split("@")[0] || "Você";
       const initials = fullName
         .split(" ")
-        .map((n) => n[0])
+        .map((n: string) => n[0])
         .filter(Boolean)
         .slice(0, 2)
         .join("")
@@ -94,7 +96,7 @@ function useUserProfile() {
       return {
         fullName,
         email: user.email ?? "",
-        avatarUrl: (profile as { avatar_url?: string | null } | null)?.avatar_url ?? null,
+        avatarUrl: null as string | null,
         initials,
       };
     },
