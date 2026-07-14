@@ -15,6 +15,8 @@ export type MedicationRow = {
   stock_threshold: number;
   pills_per_dose: number;
   alert_phone: string | null;
+  alarm_enabled?: boolean;
+  alarm_message?: string | null;
 };
 
 export type LogRow = {

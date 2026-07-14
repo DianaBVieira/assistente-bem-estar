@@ -13,9 +13,10 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import {
   Plus, Calendar as CalendarIcon, MapPin, User as UserIcon, Stethoscope,
-  Pencil, Trash2, ChevronLeft, ChevronRight, Check, X, RotateCcw, List, Grid3x3,
+  Pencil, Trash2, ChevronLeft, ChevronRight, Check, X, RotateCcw, List, Grid3x3, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
@@ -401,6 +402,15 @@ function AppointmentDialog({ editing, presetDate, onClose }: {
   const [reminder, setReminder] = useState(editing?.reminder_minutes_before ?? 60);
   const [status, setStatus] = useState<AppointmentStatus>(editing?.status ?? "agendado");
   const [notes, setNotes] = useState(editing?.notes ?? "");
+  const defaultApptMsg = (t: string, r: number) =>
+    `Lembrete: você tem ${t || "um compromisso"} em ${r} minutos.`;
+  const [alarmEnabled, setAlarmEnabled] = useState<boolean>(
+    (editing as { alarm_enabled?: boolean } | null)?.alarm_enabled ?? true,
+  );
+  const [alarmMessage, setAlarmMessage] = useState<string>(
+    (editing as { alarm_message?: string | null } | null)?.alarm_message ??
+      defaultApptMsg(editing?.title ?? "", editing?.reminder_minutes_before ?? 60),
+  );
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -424,6 +434,8 @@ function AppointmentDialog({ editing, presetDate, onClose }: {
         reminder_minutes_before: reminder,
         status,
         notes: notes.trim() || null,
+        alarm_enabled: alarmEnabled,
+        alarm_message: alarmMessage.trim() || defaultApptMsg(title, reminder),
       };
       if (editing) {
         const { error } = await supabase.from("appointments").update(payload).eq("id", editing.id);
@@ -527,6 +539,27 @@ function AppointmentDialog({ editing, presetDate, onClose }: {
           <Textarea id="notes" value={notes} onChange={(e) => setNotes(e.target.value)} rows={2}
                     placeholder="Levar exames anteriores, jejum, etc." />
         </div>
+
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              <p className="font-semibold text-sm">Alarme</p>
+            </div>
+            <Switch checked={alarmEnabled} onCheckedChange={setAlarmEnabled} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="appt-alarm-msg">Mensagem falada pelo alarme</Label>
+            <Textarea id="appt-alarm-msg" rows={2} value={alarmMessage}
+                      onChange={(e) => setAlarmMessage(e.target.value)}
+                      disabled={!alarmEnabled}
+                      placeholder={defaultApptMsg(title, reminder)} />
+            <p className="text-xs text-muted-foreground">
+              Essa frase será falada quando o alarme tocar, {reminder} min antes.
+            </p>
+          </div>
+        </div>
+
 
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>

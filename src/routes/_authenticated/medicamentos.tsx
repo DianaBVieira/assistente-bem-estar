@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Pill, Trash2, Pencil, Camera, X, Clock, Package, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Pill, Trash2, Pencil, Camera, X, Clock, Package, AlertTriangle, Bell } from "lucide-react";
 import { toast } from "sonner";
 import type { MedicationRow } from "@/lib/medication-utils";
 
@@ -158,6 +159,12 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
   const [stockThreshold, setStockThreshold] = useState<string>(String(editing?.stock_threshold ?? 4));
   const [pillsPerDose, setPillsPerDose] = useState<string>(String(editing?.pills_per_dose ?? 1));
   const [alertPhone, setAlertPhone] = useState(editing?.alert_phone ?? "");
+  const defaultMedMsg = (n: string, d: string) =>
+    `Hora de tomar ${n || "seu medicamento"}${d ? `, ${d}` : ""}.`;
+  const [alarmEnabled, setAlarmEnabled] = useState<boolean>(editing?.alarm_enabled ?? true);
+  const [alarmMessage, setAlarmMessage] = useState<string>(
+    editing?.alarm_message ?? defaultMedMsg(editing?.name ?? "", editing?.dosage ?? ""),
+  );
   const [saving, setSaving] = useState(false);
 
   function addTime() { setTimes([...times, "12:00"]); }
@@ -212,6 +219,8 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
         stock_threshold: Math.max(0, Number(stockThreshold) || 4),
         pills_per_dose: Math.max(1, Number(pillsPerDose) || 1),
         alert_phone: alertPhone.trim() || null,
+        alarm_enabled: alarmEnabled,
+        alarm_message: alarmMessage.trim() || defaultMedMsg(name, dosage),
       };
 
       if (editing) {
@@ -343,6 +352,27 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
             </p>
           </div>
         </div>
+
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              <p className="font-semibold text-sm">Alarme</p>
+            </div>
+            <Switch checked={alarmEnabled} onCheckedChange={setAlarmEnabled} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="alarm-msg">Mensagem falada pelo alarme</Label>
+            <Textarea id="alarm-msg" rows={2} value={alarmMessage}
+                      onChange={(e) => setAlarmMessage(e.target.value)}
+                      disabled={!alarmEnabled}
+                      placeholder={defaultMedMsg(name, dosage)} />
+            <p className="text-xs text-muted-foreground">
+              Essa frase será falada quando o alarme tocar.
+            </p>
+          </div>
+        </div>
+
 
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>

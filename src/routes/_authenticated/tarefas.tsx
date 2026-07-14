@@ -14,10 +14,11 @@ import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
+import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle2, Plus, Trash2, Pencil, ListTodo, Droplet, Footprints,
-  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon,
+  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 
@@ -38,6 +39,8 @@ type TaskRow = {
   completed: boolean;
   completed_at: string | null;
   created_at: string;
+  alarm_enabled?: boolean;
+  alarm_message?: string | null;
 };
 
 const PRIORITY_LABEL: Record<Priority, string> = { baixa: "Baixa", media: "Média", alta: "Alta" };
@@ -298,6 +301,9 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
   const [category, setCategory] = useState("");
   const [priority, setPriority] = useState<Priority>("media");
   const [dueAt, setDueAt] = useState("");
+  const defaultTaskMsg = (t: string) => `Lembrete de tarefa: ${t || "sua tarefa"}.`;
+  const [alarmEnabled, setAlarmEnabled] = useState(true);
+  const [alarmMessage, setAlarmMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
   // reset when opening
@@ -308,6 +314,8 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
       setCategory(editing?.category ?? "");
       setPriority(editing?.priority ?? "media");
       setDueAt(toLocalInput(editing?.due_at ?? null));
+      setAlarmEnabled(editing?.alarm_enabled ?? true);
+      setAlarmMessage(editing?.alarm_message ?? defaultTaskMsg(editing?.title ?? ""));
     }
   }, [open, editing]);
 
@@ -323,6 +331,8 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
         category: category.trim() || null,
         priority,
         due_at: fromLocalInput(dueAt),
+        alarm_enabled: alarmEnabled,
+        alarm_message: alarmMessage.trim() || defaultTaskMsg(title),
       };
       if (editing) {
         const { error } = await supabase.from("tasks").update(payload).eq("id", editing.id);
@@ -377,6 +387,22 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
           <div>
             <Label htmlFor="t-due">Prazo</Label>
             <Input id="t-due" type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
+          </div>
+          <div className="border-t pt-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-primary" />
+                <p className="font-semibold text-sm">Alarme</p>
+              </div>
+              <Switch checked={alarmEnabled} onCheckedChange={setAlarmEnabled} />
+            </div>
+            <div>
+              <Label htmlFor="t-alarm-msg">Mensagem falada</Label>
+              <Textarea id="t-alarm-msg" rows={2} value={alarmMessage}
+                        onChange={(e) => setAlarmMessage(e.target.value)}
+                        disabled={!alarmEnabled}
+                        placeholder={defaultTaskMsg(title)} />
+            </div>
           </div>
         </div>
         <DialogFooter>

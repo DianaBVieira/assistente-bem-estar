@@ -77,12 +77,12 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   const [medsRes, tasksRes, apptsRes] = await Promise.all([
     supabase
       .from("medications")
-      .select("id,name,dosage,times,start_date,end_date,active")
+      .select("id,name,dosage,times,start_date,end_date,active,alarm_enabled,alarm_message")
       .eq("user_id", userId)
       .eq("active", true),
     supabase
       .from("tasks")
-      .select("id,title,due_at,completed")
+      .select("id,title,due_at,completed,alarm_enabled,alarm_message")
       .eq("user_id", userId)
       .eq("completed", false)
       .not("due_at", "is", null)
@@ -90,7 +90,7 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
       .lte("due_at", horizon.toISOString()),
     supabase
       .from("appointments")
-      .select("id,title,doctor,location,scheduled_at,reminder_minutes_before,status")
+      .select("id,title,doctor,location,scheduled_at,reminder_minutes_before,status,alarm_enabled,alarm_message")
       .eq("user_id", userId)
       .neq("status", "cancelado")
       .gte("scheduled_at", now.toISOString())
@@ -103,6 +103,7 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   const out: AlarmEvent[] = [];
 
   for (const med of medsRes.data ?? []) {
+    if (med.alarm_enabled === false) continue;
     if (med.start_date && med.start_date > todayIso) continue;
     if (med.end_date && med.end_date < todayIso) continue;
     for (const t of (med.times ?? []) as string[]) {
@@ -112,42 +113,47 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
       dt.setHours(h, m || 0, 0, 0);
       if (dt.getTime() < now.getTime() - FIRE_WINDOW_MS) continue;
       if (dt.getTime() > horizon.getTime()) continue;
+      const defaultSpeech = `Hora de tomar ${med.name}${med.dosage ? `, ${med.dosage}` : ""}.`;
       out.push({
         key: `med:${med.id}:${dt.toISOString()}`,
         kind: "medication",
         title: `Hora do remédio: ${med.name}`,
         subtitle: med.dosage ?? undefined,
         scheduledAt: dt,
-        speech: `Hora de tomar ${med.name}${med.dosage ? `, ${med.dosage}` : ""}.`,
+        speech: (med.alarm_message?.trim() || defaultSpeech),
       });
     }
   }
 
   for (const task of tasksRes.data ?? []) {
     if (!task.due_at) continue;
+    if (task.alarm_enabled === false) continue;
     const dt = new Date(task.due_at);
+    const defaultSpeech = `Lembrete de tarefa: ${task.title}.`;
     out.push({
       key: `task:${task.id}:${dt.toISOString()}`,
       kind: "task",
       title: task.title,
       subtitle: "Tarefa",
       scheduledAt: dt,
-      speech: `Lembrete de tarefa: ${task.title}.`,
+      speech: (task.alarm_message?.trim() || defaultSpeech),
     });
   }
 
   for (const a of apptsRes.data ?? []) {
+    if (a.alarm_enabled === false) continue;
     const rmin = a.reminder_minutes_before ?? 60;
     const dt = new Date(new Date(a.scheduled_at).getTime() - rmin * 60_000);
     if (dt.getTime() < now.getTime() - FIRE_WINDOW_MS) continue;
     if (dt.getTime() > horizon.getTime()) continue;
+    const defaultSpeech = `Lembrete: você tem ${a.title} em ${rmin} minutos.`;
     out.push({
       key: `appt:${a.id}:${dt.toISOString()}`,
       kind: "appointment",
       title: `Compromisso em ${rmin} min: ${a.title}`,
       subtitle: [a.doctor, a.location].filter(Boolean).join(" • ") || undefined,
       scheduledAt: dt,
-      speech: `Lembrete: você tem ${a.title} em ${rmin} minutos.`,
+      speech: (a.alarm_message?.trim() || defaultSpeech),
     });
   }
 
