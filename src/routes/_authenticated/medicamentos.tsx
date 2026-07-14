@@ -159,6 +159,12 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
   const [stockThreshold, setStockThreshold] = useState<string>(String(editing?.stock_threshold ?? 4));
   const [pillsPerDose, setPillsPerDose] = useState<string>(String(editing?.pills_per_dose ?? 1));
   const [alertPhone, setAlertPhone] = useState(editing?.alert_phone ?? "");
+  const defaultMedMsg = (n: string, d: string) =>
+    `Hora de tomar ${n || "seu medicamento"}${d ? `, ${d}` : ""}.`;
+  const [alarmEnabled, setAlarmEnabled] = useState<boolean>(editing?.alarm_enabled ?? true);
+  const [alarmMessage, setAlarmMessage] = useState<string>(
+    editing?.alarm_message ?? defaultMedMsg(editing?.name ?? "", editing?.dosage ?? ""),
+  );
   const [saving, setSaving] = useState(false);
 
   function addTime() { setTimes([...times, "12:00"]); }
