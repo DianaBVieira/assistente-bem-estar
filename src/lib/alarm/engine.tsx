@@ -125,18 +125,70 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   }
 
   for (const task of tasksRes.data ?? []) {
-    if (!task.due_at) continue;
     if (task.alarm_enabled === false) continue;
-    const dt = new Date(task.due_at);
     const defaultSpeech = `Lembrete de tarefa: ${task.title}.`;
-    out.push({
-      key: `task:${task.id}:${dt.toISOString()}`,
-      kind: "task",
-      title: task.title,
-      subtitle: "Tarefa",
-      scheduledAt: dt,
-      speech: (task.alarm_message?.trim() || defaultSpeech),
-    });
+    const speech = task.alarm_message?.trim() || defaultSpeech;
+    const rtype = (task.recurrence_type ?? "none") as "none" | "interval" | "weekly";
+
+    if (rtype === "none") {
+      if (!task.due_at) continue;
+      const dt = new Date(task.due_at);
+      out.push({
+        key: `task:${task.id}:${dt.toISOString()}`,
+        kind: "task",
+        title: task.title,
+        subtitle: "Tarefa",
+        scheduledAt: dt,
+        speech,
+      });
+      continue;
+    }
+
+    // Recurring: enumerate candidate times within [now-FIRE_WINDOW, horizon]
+    const dow = now.getDay();
+    const weekdays = (task.weekdays ?? []) as number[];
+    if (weekdays.length > 0 && !weekdays.includes(dow)) continue;
+
+    const candidates: Date[] = [];
+    if (rtype === "interval") {
+      const step = Math.max(1, task.interval_minutes ?? 60);
+      const [ws, we] = parseWindow(task.window_start, task.window_end);
+      const startDt = new Date(now);
+      startDt.setHours(ws.h, ws.m, 0, 0);
+      const endDt = new Date(now);
+      endDt.setHours(we.h, we.m, 0, 0);
+      // step through the day
+      for (
+        let t = startDt.getTime();
+        t <= endDt.getTime();
+        t += step * 60_000
+      ) {
+        if (t < now.getTime() - FIRE_WINDOW_MS) continue;
+        if (t > horizon.getTime()) break;
+        candidates.push(new Date(t));
+      }
+    } else if (rtype === "weekly") {
+      for (const t of (task.times_of_day ?? []) as string[]) {
+        const [h, m] = t.split(":").map(Number);
+        if (Number.isNaN(h)) continue;
+        const dt = new Date(now);
+        dt.setHours(h, m || 0, 0, 0);
+        if (dt.getTime() < now.getTime() - FIRE_WINDOW_MS) continue;
+        if (dt.getTime() > horizon.getTime()) continue;
+        candidates.push(dt);
+      }
+    }
+
+    for (const dt of candidates) {
+      out.push({
+        key: `task:${task.id}:${dt.toISOString()}`,
+        kind: "task",
+        title: task.title,
+        subtitle: "Tarefa",
+        scheduledAt: dt,
+        speech,
+      });
+    }
   }
 
   for (const a of apptsRes.data ?? []) {
