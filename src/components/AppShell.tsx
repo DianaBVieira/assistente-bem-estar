@@ -16,7 +16,9 @@ import {
   SidebarProvider,
   SidebarRail,
   SidebarTrigger,
+  useSidebar,
 } from "@/components/ui/sidebar";
+
 
 const nav = [
   { to: "/inicio", label: "Início", icon: Home },
