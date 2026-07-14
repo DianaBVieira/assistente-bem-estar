@@ -13,9 +13,10 @@ import {
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
+import { Switch } from "@/components/ui/switch";
 import {
   Plus, Calendar as CalendarIcon, MapPin, User as UserIcon, Stethoscope,
-  Pencil, Trash2, ChevronLeft, ChevronRight, Check, X, RotateCcw, List, Grid3x3,
+  Pencil, Trash2, ChevronLeft, ChevronRight, Check, X, RotateCcw, List, Grid3x3, Bell,
 } from "lucide-react";
 import { toast } from "sonner";
 import {
