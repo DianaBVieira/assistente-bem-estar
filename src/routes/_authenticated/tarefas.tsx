@@ -388,6 +388,22 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
             <Label htmlFor="t-due">Prazo</Label>
             <Input id="t-due" type="datetime-local" value={dueAt} onChange={(e) => setDueAt(e.target.value)} />
           </div>
+          <div className="border-t pt-3 space-y-2">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                <Bell className="w-4 h-4 text-primary" />
+                <p className="font-semibold text-sm">Alarme</p>
+              </div>
+              <Switch checked={alarmEnabled} onCheckedChange={setAlarmEnabled} />
+            </div>
+            <div>
+              <Label htmlFor="t-alarm-msg">Mensagem falada</Label>
+              <Textarea id="t-alarm-msg" rows={2} value={alarmMessage}
+                        onChange={(e) => setAlarmMessage(e.target.value)}
+                        disabled={!alarmEnabled}
+                        placeholder={defaultTaskMsg(title)} />
+            </div>
+          </div>
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => onOpenChange(false)}>Cancelar</Button>
