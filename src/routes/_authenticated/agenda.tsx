@@ -402,6 +402,15 @@ function AppointmentDialog({ editing, presetDate, onClose }: {
   const [reminder, setReminder] = useState(editing?.reminder_minutes_before ?? 60);
   const [status, setStatus] = useState<AppointmentStatus>(editing?.status ?? "agendado");
   const [notes, setNotes] = useState(editing?.notes ?? "");
+  const defaultApptMsg = (t: string, r: number) =>
+    `Lembrete: você tem ${t || "um compromisso"} em ${r} minutos.`;
+  const [alarmEnabled, setAlarmEnabled] = useState<boolean>(
+    (editing as { alarm_enabled?: boolean } | null)?.alarm_enabled ?? true,
+  );
+  const [alarmMessage, setAlarmMessage] = useState<string>(
+    (editing as { alarm_message?: string | null } | null)?.alarm_message ??
+      defaultApptMsg(editing?.title ?? "", editing?.reminder_minutes_before ?? 60),
+  );
   const [saving, setSaving] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
