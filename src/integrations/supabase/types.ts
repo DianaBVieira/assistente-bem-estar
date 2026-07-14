@@ -65,6 +65,8 @@ export type Database = {
       appointments: {
         Row: {
           address: string | null
+          alarm_enabled: boolean
+          alarm_message: string | null
           created_at: string
           doctor: string | null
           duration_minutes: number
@@ -82,6 +84,8 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          alarm_enabled?: boolean
+          alarm_message?: string | null
           created_at?: string
           doctor?: string | null
           duration_minutes?: number
@@ -99,6 +103,8 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          alarm_enabled?: boolean
+          alarm_message?: string | null
           created_at?: string
           doctor?: string | null
           duration_minutes?: number
@@ -343,6 +349,8 @@ export type Database = {
       medications: {
         Row: {
           active: boolean
+          alarm_enabled: boolean
+          alarm_message: string | null
           alert_phone: string | null
           created_at: string
           doctor: string | null
@@ -363,6 +371,8 @@ export type Database = {
         }
         Insert: {
           active?: boolean
+          alarm_enabled?: boolean
+          alarm_message?: string | null
           alert_phone?: string | null
           created_at?: string
           doctor?: string | null
@@ -383,6 +393,8 @@ export type Database = {
         }
         Update: {
           active?: boolean
+          alarm_enabled?: boolean
+          alarm_message?: string | null
           alert_phone?: string | null
           created_at?: string
           doctor?: string | null
@@ -426,6 +438,8 @@ export type Database = {
       }
       tasks: {
         Row: {
+          alarm_enabled: boolean
+          alarm_message: string | null
           category: string | null
           completed: boolean
           completed_at: string | null
@@ -439,6 +453,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          alarm_enabled?: boolean
+          alarm_message?: string | null
           category?: string | null
           completed?: boolean
           completed_at?: string | null
@@ -452,6 +468,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          alarm_enabled?: boolean
+          alarm_message?: string | null
           category?: string | null
           completed?: boolean
           completed_at?: string | null
