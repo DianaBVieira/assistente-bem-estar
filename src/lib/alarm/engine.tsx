@@ -80,6 +80,8 @@ function parseWindow(
     return { h, m: m || 0 };
   };
   return [parse(start ?? "", { h: 8, m: 0 }), parse(end ?? "", { h: 22, m: 0 })];
+}
+
 
 async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   const now = new Date();
