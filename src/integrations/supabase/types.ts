@@ -447,10 +447,16 @@ export type Database = {
           description: string | null
           due_at: string | null
           id: string
+          interval_minutes: number | null
           priority: Database["public"]["Enums"]["task_priority"]
+          recurrence_type: string
+          times_of_day: string[]
           title: string
           updated_at: string
           user_id: string
+          weekdays: number[]
+          window_end: string | null
+          window_start: string | null
         }
         Insert: {
           alarm_enabled?: boolean
@@ -462,10 +468,16 @@ export type Database = {
           description?: string | null
           due_at?: string | null
           id?: string
+          interval_minutes?: number | null
           priority?: Database["public"]["Enums"]["task_priority"]
+          recurrence_type?: string
+          times_of_day?: string[]
           title: string
           updated_at?: string
           user_id: string
+          weekdays?: number[]
+          window_end?: string | null
+          window_start?: string | null
         }
         Update: {
           alarm_enabled?: boolean
@@ -477,10 +489,16 @@ export type Database = {
           description?: string | null
           due_at?: string | null
           id?: string
+          interval_minutes?: number | null
           priority?: Database["public"]["Enums"]["task_priority"]
+          recurrence_type?: string
+          times_of_day?: string[]
           title?: string
           updated_at?: string
           user_id?: string
+          weekdays?: number[]
+          window_end?: string | null
+          window_start?: string | null
         }
         Relationships: []
       }
