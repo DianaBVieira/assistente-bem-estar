@@ -18,7 +18,7 @@ import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   CheckCircle2, Plus, Trash2, Pencil, ListTodo, Droplet, Footprints,
-  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon, Bell,
+  Pill, Stethoscope, Sparkles, Flag, Calendar as CalendarIcon, Bell, RotateCw,
 } from "lucide-react";
 import { toast } from "sonner";
 
