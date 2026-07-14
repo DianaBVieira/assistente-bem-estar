@@ -4,6 +4,22 @@ import { supabase } from "@/integrations/supabase/client";
 import { useQueryClient } from "@tanstack/react-query";
 import type { ReactNode } from "react";
 
+import {
+  Sidebar,
+  SidebarContent,
+  SidebarFooter,
+  SidebarHeader,
+  SidebarInset,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarProvider,
+  SidebarRail,
+  SidebarTrigger,
+  useSidebar,
+} from "@/components/ui/sidebar";
+
+
 const nav = [
   { to: "/inicio", label: "Início", icon: Home },
   { to: "/medicamentos", label: "Remédios", icon: Pill },
@@ -15,6 +31,37 @@ const nav = [
   { to: "/relatorios", label: "Relatórios", icon: BarChart3 },
   { to: "/emergencia", label: "SOS", icon: Siren },
 ] as const;
+
+function NavLink({
+  to,
+  label,
+  icon: Icon,
+  active,
+}: {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  active: boolean;
+}) {
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={active} tooltip={label}>
+        <Link
+          to={to}
+          className="flex items-center gap-2"
+          onClick={() => {
+            if (isMobile) setOpenMobile(false);
+          }}
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+          <span className="truncate">{label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
 
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
@@ -29,58 +76,89 @@ export function AppShell({ children }: { children: ReactNode }) {
   }
 
   return (
-    <div className="min-h-screen bg-background pb-24 md:pb-0">
-      {/* Top bar */}
-      <header className="sticky top-0 z-30 backdrop-blur bg-background/80 border-b border-border">
-        <div className="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
-          <Link to="/inicio" className="flex items-center gap-2 font-semibold">
-            <span className="inline-flex w-8 h-8 rounded-lg items-center justify-center text-primary-foreground"
-                  style={{ background: "var(--gradient-primary)" }}>
-              <HeartPulse className="w-4 h-4" />
+    <SidebarProvider defaultOpen>
+      <Sidebar collapsible="icon" variant="sidebar">
+        <SidebarHeader>
+          <Link
+            to="/inicio"
+            className="flex items-center gap-2 px-2 py-3 font-semibold"
+          >
+            <span
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-primary-foreground"
+              style={{ background: "var(--gradient-primary)" }}
+            >
+              <HeartPulse className="h-4 w-4" />
             </span>
-            Minha Rotina
+            <span className="truncate group-data-[collapsible=icon]:hidden">
+              Minha Rotina
+            </span>
           </Link>
-          <nav className="hidden md:flex gap-1">
-            {nav.map((item) => {
-              const active = pathname.startsWith(item.to);
-              return (
-                <Link key={item.to} to={item.to}
-                      className={`px-3 py-2 rounded-lg text-sm font-medium transition flex items-center gap-2 ${
-                        active ? "bg-primary-soft text-primary" : "text-muted-foreground hover:bg-muted"
-                      }`}>
-                  <item.icon className="w-4 h-4" />
-                  {item.label}
-                </Link>
-              );
-            })}
-          </nav>
-          <button onClick={handleSignOut}
-                  className="p-2 rounded-lg text-muted-foreground hover:bg-muted hover:text-foreground transition"
-                  aria-label="Sair">
-            <LogOut className="w-4 h-4" />
+        </SidebarHeader>
+
+        <SidebarContent>
+          <SidebarMenu>
+            {nav.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                label={item.label}
+                icon={item.icon}
+                active={pathname.startsWith(item.to)}
+              />
+            ))}
+          </SidebarMenu>
+        </SidebarContent>
+
+
+        <SidebarFooter>
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Sair">
+                <button
+                  onClick={handleSignOut}
+                  className="flex items-center gap-2"
+                  aria-label="Sair"
+                >
+                  <LogOut className="h-4 w-4 shrink-0" />
+                  <span className="truncate">Sair</span>
+                </button>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        </SidebarFooter>
+
+        <SidebarRail />
+      </Sidebar>
+
+      <SidebarInset>
+        <header className="sticky top-0 z-30 flex h-14 items-center justify-between gap-3 border-b border-border bg-background/80 px-4 backdrop-blur">
+          <div className="flex items-center gap-2">
+            <SidebarTrigger />
+            <Link
+              to="/inicio"
+              className="flex items-center gap-2 font-semibold md:hidden"
+            >
+              <span
+                className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-primary-foreground"
+                style={{ background: "var(--gradient-primary)" }}
+              >
+                <HeartPulse className="h-4 w-4" />
+              </span>
+              <span className="truncate">Minha Rotina</span>
+            </Link>
+          </div>
+
+          <button
+            onClick={handleSignOut}
+            className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-muted-foreground transition hover:bg-muted hover:text-foreground"
+            aria-label="Sair"
+          >
+            <LogOut className="h-4 w-4" />
           </button>
-        </div>
-      </header>
+        </header>
 
-      <main className="max-w-5xl mx-auto px-4 py-6">{children}</main>
-
-      {/* Bottom nav (mobile) */}
-      <nav className="md:hidden fixed bottom-0 inset-x-0 bg-card border-t border-border z-30">
-        <div className="flex">
-          {nav.map((item) => {
-            const active = pathname.startsWith(item.to);
-            return (
-              <Link key={item.to} to={item.to}
-                    className={`flex-1 py-3 flex flex-col items-center gap-1 text-xs font-medium transition ${
-                      active ? "text-primary" : "text-muted-foreground"
-                    }`}>
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
-    </div>
+        <main className="mx-auto max-w-5xl px-4 py-6">{children}</main>
+      </SidebarInset>
+    </SidebarProvider>
   );
 }
