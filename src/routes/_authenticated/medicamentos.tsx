@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter,
 } from "@/components/ui/dialog";
-import { Plus, Pill, Trash2, Pencil, Camera, X, Clock, Package, AlertTriangle } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Plus, Pill, Trash2, Pencil, Camera, X, Clock, Package, AlertTriangle, Bell } from "lucide-react";
 import { toast } from "sonner";
 import type { MedicationRow } from "@/lib/medication-utils";
 
