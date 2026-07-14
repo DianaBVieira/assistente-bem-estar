@@ -90,6 +90,34 @@ function formatDue(iso: string | null): string {
   return `${d.toLocaleDateString("pt-BR", { day: "2-digit", month: "short" })} • ${time}`;
 }
 
+const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
+
+function formatRecurrence(t: TaskRow): string | null {
+  const type = t.recurrence_type ?? "none";
+  if (type === "none") return null;
+  const daysPart = () => {
+    const days = t.weekdays ?? [];
+    if (days.length === 0 || days.length === 7) return "todos os dias";
+    const workdays = [1, 2, 3, 4, 5];
+    const weekend = [0, 6];
+    const sorted = [...days].sort();
+    if (sorted.length === 5 && workdays.every((d) => sorted.includes(d)))
+      return "seg a sex";
+    if (sorted.length === 2 && weekend.every((d) => sorted.includes(d)))
+      return "fins de semana";
+    return sorted.map((d) => WEEKDAY_LABELS[d]).join(", ");
+  };
+  if (type === "interval") {
+    const mins = t.interval_minutes ?? 60;
+    const label =
+      mins % 60 === 0 ? `${mins / 60}h` : mins >= 60 ? `${(mins / 60).toFixed(1)}h` : `${mins} min`;
+    const w = `${(t.window_start ?? "08:00").slice(0, 5)}–${(t.window_end ?? "22:00").slice(0, 5)}`;
+    return `A cada ${label} • ${w} • ${daysPart()}`;
+  }
+  const times = (t.times_of_day ?? []).map((s) => s.slice(0, 5)).join(", ") || "—";
+  return `${daysPart()} às ${times}`;
+}
+
 function TasksPage() {
   const qc = useQueryClient();
   const [tab, setTab] = useState<"pendentes" | "concluidas">("pendentes");
