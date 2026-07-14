@@ -353,6 +353,27 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
           </div>
         </div>
 
+        <div className="border-t pt-4 space-y-3">
+          <div className="flex items-center justify-between gap-2">
+            <div className="flex items-center gap-2">
+              <Bell className="w-4 h-4 text-primary" />
+              <p className="font-semibold text-sm">Alarme</p>
+            </div>
+            <Switch checked={alarmEnabled} onCheckedChange={setAlarmEnabled} />
+          </div>
+          <div className="space-y-1.5">
+            <Label htmlFor="alarm-msg">Mensagem falada pelo alarme</Label>
+            <Textarea id="alarm-msg" rows={2} value={alarmMessage}
+                      onChange={(e) => setAlarmMessage(e.target.value)}
+                      disabled={!alarmEnabled}
+                      placeholder={defaultMedMsg(name, dosage)} />
+            <p className="text-xs text-muted-foreground">
+              Essa frase será falada quando o alarme tocar.
+            </p>
+          </div>
+        </div>
+
+
         <DialogFooter>
           <Button type="button" variant="ghost" onClick={onClose}>Cancelar</Button>
           <Button type="submit" disabled={saving}>{saving ? "Salvando…" : "Salvar"}</Button>
