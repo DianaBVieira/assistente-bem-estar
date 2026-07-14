@@ -301,6 +301,9 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
   const [category, setCategory] = useState("");
   const [priority, setPriority] = useState<Priority>("media");
   const [dueAt, setDueAt] = useState("");
+  const defaultTaskMsg = (t: string) => `Lembrete de tarefa: ${t || "sua tarefa"}.`;
+  const [alarmEnabled, setAlarmEnabled] = useState(true);
+  const [alarmMessage, setAlarmMessage] = useState("");
   const [saving, setSaving] = useState(false);
 
   // reset when opening
