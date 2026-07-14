@@ -82,12 +82,11 @@ async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
       .eq("active", true),
     supabase
       .from("tasks")
-      .select("id,title,due_at,completed,alarm_enabled,alarm_message")
+      .select("id,title,due_at,completed,alarm_enabled,alarm_message,recurrence_type,interval_minutes,window_start,window_end,weekdays,times_of_day")
       .eq("user_id", userId)
-      .eq("completed", false)
-      .not("due_at", "is", null)
-      .gte("due_at", now.toISOString())
-      .lte("due_at", horizon.toISOString()),
+      .or(
+        `and(recurrence_type.eq.none,completed.eq.false,due_at.gte.${now.toISOString()},due_at.lte.${horizon.toISOString()}),recurrence_type.neq.none`,
+      ),
     supabase
       .from("appointments")
       .select("id,title,doctor,location,scheduled_at,reminder_minutes_before,status,alarm_enabled,alarm_message")
