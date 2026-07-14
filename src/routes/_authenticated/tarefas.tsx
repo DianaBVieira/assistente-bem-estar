@@ -286,6 +286,7 @@ function TaskItem({ task, onToggle, onEdit, onDelete }: {
   onDelete: () => void;
 }) {
   const overdue = !task.completed && task.due_at && new Date(task.due_at) < new Date();
+  const rec = formatRecurrence(task);
   return (
     <Card className="p-3">
       <div className="flex items-start gap-3">
@@ -303,14 +304,26 @@ function TaskItem({ task, onToggle, onEdit, onDelete }: {
                 {task.category}
               </span>
             )}
+            {rec && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-medium bg-primary-soft text-primary flex items-center gap-1">
+                <RotateCw className="w-3 h-3" /> Recorrente
+              </span>
+            )}
           </div>
           {task.description && (
             <p className="text-sm text-muted-foreground mt-0.5 line-clamp-2">{task.description}</p>
           )}
-          <p className={`text-xs mt-1 ${overdue ? "text-destructive font-medium" : "text-muted-foreground"}`}>
-            <CalendarIcon className="w-3 h-3 inline mr-1" />
-            {formatDue(task.due_at)}
-          </p>
+          {rec ? (
+            <p className="text-xs mt-1 text-muted-foreground">
+              <RotateCw className="w-3 h-3 inline mr-1" />
+              {rec}
+            </p>
+          ) : (
+            <p className={`text-xs mt-1 ${overdue ? "text-destructive font-medium" : "text-muted-foreground"}`}>
+              <CalendarIcon className="w-3 h-3 inline mr-1" />
+              {formatDue(task.due_at)}
+            </p>
+          )}
         </div>
         <div className="flex flex-col gap-1">
           <Button size="icon" variant="ghost" onClick={onEdit} aria-label="Editar">
