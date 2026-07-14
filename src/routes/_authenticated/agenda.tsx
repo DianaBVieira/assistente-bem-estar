@@ -434,6 +434,8 @@ function AppointmentDialog({ editing, presetDate, onClose }: {
         reminder_minutes_before: reminder,
         status,
         notes: notes.trim() || null,
+        alarm_enabled: alarmEnabled,
+        alarm_message: alarmMessage.trim() || defaultApptMsg(title, reminder),
       };
       if (editing) {
         const { error } = await supabase.from("appointments").update(payload).eq("id", editing.id);
