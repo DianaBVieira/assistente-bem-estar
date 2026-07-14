@@ -28,6 +28,7 @@ export const Route = createFileRoute("/_authenticated/tarefas")({
 });
 
 type Priority = "baixa" | "media" | "alta";
+type RecurrenceType = "none" | "interval" | "weekly";
 type TaskRow = {
   id: string;
   user_id: string;
@@ -41,6 +42,12 @@ type TaskRow = {
   created_at: string;
   alarm_enabled?: boolean;
   alarm_message?: string | null;
+  recurrence_type?: RecurrenceType;
+  interval_minutes?: number | null;
+  window_start?: string | null;
+  window_end?: string | null;
+  weekdays?: number[];
+  times_of_day?: string[];
 };
 
 const PRIORITY_LABEL: Record<Priority, string> = { baixa: "Baixa", media: "Média", alta: "Alta" };
