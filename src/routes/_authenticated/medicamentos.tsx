@@ -219,6 +219,8 @@ function MedicationDialog({ editing, onClose }: { editing: MedicationRow | null;
         stock_threshold: Math.max(0, Number(stockThreshold) || 4),
         pills_per_dose: Math.max(1, Number(pillsPerDose) || 1),
         alert_phone: alertPhone.trim() || null,
+        alarm_enabled: alarmEnabled,
+        alarm_message: alarmMessage.trim() || defaultMedMsg(name, dosage),
       };
 
       if (editing) {
