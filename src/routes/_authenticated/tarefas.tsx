@@ -39,6 +39,8 @@ type TaskRow = {
   completed: boolean;
   completed_at: string | null;
   created_at: string;
+  alarm_enabled?: boolean;
+  alarm_message?: string | null;
 };
 
 const PRIORITY_LABEL: Record<Priority, string> = { baixa: "Baixa", media: "Média", alta: "Alta" };
