@@ -32,6 +32,37 @@ const nav = [
   { to: "/emergencia", label: "SOS", icon: Siren },
 ] as const;
 
+function NavLink({
+  to,
+  label,
+  icon: Icon,
+  active,
+}: {
+  to: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  active: boolean;
+}) {
+  const { isMobile, setOpenMobile } = useSidebar();
+
+  return (
+    <SidebarMenuItem>
+      <SidebarMenuButton asChild isActive={active} tooltip={label}>
+        <Link
+          to={to}
+          className="flex items-center gap-2"
+          onClick={() => {
+            if (isMobile) setOpenMobile(false);
+          }}
+        >
+          <Icon className="h-4 w-4 shrink-0" />
+          <span className="truncate">{label}</span>
+        </Link>
+      </SidebarMenuButton>
+    </SidebarMenuItem>
+  );
+}
+
 export function AppShell({ children }: { children: ReactNode }) {
   const navigate = useNavigate();
   const qc = useQueryClient();
@@ -66,25 +97,18 @@ export function AppShell({ children }: { children: ReactNode }) {
 
         <SidebarContent>
           <SidebarMenu>
-            {nav.map((item) => {
-              const active = pathname.startsWith(item.to);
-              return (
-                <SidebarMenuItem key={item.to}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={active}
-                    tooltip={item.label}
-                  >
-                    <Link to={item.to} className="flex items-center gap-2">
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      <span className="truncate">{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              );
-            })}
+            {nav.map((item) => (
+              <NavLink
+                key={item.to}
+                to={item.to}
+                label={item.label}
+                icon={item.icon}
+                active={pathname.startsWith(item.to)}
+              />
+            ))}
           </SidebarMenu>
         </SidebarContent>
+
 
         <SidebarFooter>
           <SidebarMenu>
