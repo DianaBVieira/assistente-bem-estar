@@ -314,6 +314,8 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
       setCategory(editing?.category ?? "");
       setPriority(editing?.priority ?? "media");
       setDueAt(toLocalInput(editing?.due_at ?? null));
+      setAlarmEnabled(editing?.alarm_enabled ?? true);
+      setAlarmMessage(editing?.alarm_message ?? defaultTaskMsg(editing?.title ?? ""));
     }
   }, [open, editing]);
 
@@ -329,6 +331,8 @@ function TaskDialog({ open, onOpenChange, editing, onSaved }: {
         category: category.trim() || null,
         priority,
         due_at: fromLocalInput(dueAt),
+        alarm_enabled: alarmEnabled,
+        alarm_message: alarmMessage.trim() || defaultTaskMsg(title),
       };
       if (editing) {
         const { error } = await supabase.from("tasks").update(payload).eq("id", editing.id);
