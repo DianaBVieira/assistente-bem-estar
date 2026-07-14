@@ -69,6 +69,18 @@ function saveFired(m: FiredMap) {
   }
 }
 
+function parseWindow(
+  start: string | null | undefined,
+  end: string | null | undefined,
+): [{ h: number; m: number }, { h: number; m: number }] {
+  const parse = (s: string, fb: { h: number; m: number }) => {
+    if (!s) return fb;
+    const [h, m] = s.split(":").map(Number);
+    if (Number.isNaN(h)) return fb;
+    return { h, m: m || 0 };
+  };
+  return [parse(start ?? "", { h: 8, m: 0 }), parse(end ?? "", { h: 22, m: 0 })];
+
 async function fetchUpcomingEvents(userId: string): Promise<AlarmEvent[]> {
   const now = new Date();
   const horizon = new Date(now.getTime() + 10 * 60 * 1000); // 10 min ahead
