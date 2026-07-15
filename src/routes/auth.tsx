@@ -6,12 +6,15 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
-import { HeartPulse, ArrowLeft } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { lovable } from "@/integrations/lovable";
+import logoAsset from "@/assets/pulso-utopia-logo.png.asset.json";
+import iconAsset from "@/assets/pulso-utopia-icon.png.asset.json";
+import utopiaIcon from "@/assets/utopia-icon.png.asset.json";
 
 export const Route = createFileRoute("/auth")({
   ssr: false,
-  head: () => ({ meta: [{ title: "Entrar — Minha Rotina" }] }),
+  head: () => ({ meta: [{ title: "Entrar — Pulso Utopia" }] }),
   component: AuthPage,
 });
 
