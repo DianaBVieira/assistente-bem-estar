@@ -210,7 +210,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F4EFE7] overflow-hidden">
                 <img src={iconAsset.url} alt="Pulso Utopia" className="h-8 w-8 object-contain" />
               </span>
-              <img src={logoAsset.url} alt="Pulso Utopia" className="h-5 w-auto object-contain" />
+              <img src={logoAsset.url} alt="Pulso Utopia" className="h-8 w-auto object-contain" />
             </Link>
           </div>
 
