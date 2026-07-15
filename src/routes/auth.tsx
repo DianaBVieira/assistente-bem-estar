@@ -97,11 +97,13 @@ function AuthPage() {
          style={{ background: "var(--gradient-primary)" }}>
       <div className="w-full max-w-md">
         <div className="text-center mb-6 text-primary-foreground">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-white/15 backdrop-blur mb-3">
-            <HeartPulse className="w-7 h-7" />
+          <div className="inline-flex items-center justify-center w-20 h-20 rounded-3xl bg-white shadow-xl mb-4 overflow-hidden">
+            <img src={iconAsset.url} alt="Pulso Utopia" className="w-16 h-16 object-contain" />
           </div>
-          <h1 className="text-3xl font-bold tracking-tight">Minha Rotina</h1>
-          <p className="text-sm opacity-90 mt-1">Sua assistente de saúde e medicamentos</p>
+          <div className="flex justify-center">
+            <img src={logoAsset.url} alt="Pulso Utopia" className="h-14 w-auto object-contain brightness-0 invert" />
+          </div>
+          <p className="text-sm opacity-90 mt-2">Seu assistente de bem-estar, medicamentos e rotina</p>
         </div>
 
         <Card className="p-6 shadow-xl border-0">
