@@ -149,16 +149,16 @@ export function AppShell({ children }: { children: ReactNode }) {
         <SidebarHeader className="border-b border-sidebar-border/70">
           <Link
             to="/inicio"
-            className="flex items-center gap-2.5 px-2 py-3"
+            className="flex items-center gap-3 px-2 py-4"
           >
-            <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F4EFE7] shadow-sm overflow-hidden">
-              <img src={iconAsset.url} alt="Pulso Utopia" className="h-8 w-8 object-contain" />
+            <span className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#F4EFE7] shadow-sm overflow-hidden group-data-[collapsible=icon]:h-9 group-data-[collapsible=icon]:w-9 group-data-[collapsible=icon]:rounded-xl">
+              <img src={iconAsset.url} alt="Pulso Utopia" className="h-11 w-11 object-contain group-data-[collapsible=icon]:h-8 group-data-[collapsible=icon]:w-8" />
             </span>
             <span className="min-w-0 flex-1 group-data-[collapsible=icon]:hidden">
               <img
                 src={logoAsset.url}
                 alt="Pulso Utopia"
-                className="h-5 w-auto object-contain object-left"
+                className="h-10 w-auto max-w-full object-contain object-left"
               />
             </span>
           </Link>
@@ -210,7 +210,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#F4EFE7] overflow-hidden">
                 <img src={iconAsset.url} alt="Pulso Utopia" className="h-8 w-8 object-contain" />
               </span>
-              <img src={logoAsset.url} alt="Pulso Utopia" className="h-5 w-auto object-contain" />
+              <img src={logoAsset.url} alt="Pulso Utopia" className="h-8 w-auto object-contain" />
             </Link>
           </div>
 
